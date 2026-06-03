@@ -548,16 +548,21 @@ tbody td{
     height: 70px;
     object-fit: contain;
   }
-  /* TAMBAHIN INI BIAR WARNA TUNGGAKAN HILANG PAS PRINT */
-  .row-tunggakan {
-    background: white !important;
-    color: black !important;
-  }
   
-  /* Biar warna IPL dkk tetep ke-print */
+  /* FORCE PRINT WARNA DULU */
     * {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
+  }
+  
+  /* BARU TIMPA WARNA TUNGGAKAN - TARUH PALING BAWAH */
+  .row-tunggakan,
+  .row-tunggakan td,
+  #tableIuran tr.row-tunggakan,
+  #tableIuran tr.row-tunggakan > td {
+    background: #fff !important;
+    background-color: #fff !important;
+    color: #000 !important;
   }
 }
 
@@ -624,9 +629,4 @@ tbody td{
 }
 .fab-container.open .fab-logo{
   transform:rotateY(180deg);
-}
-@media print{
-  .fab-container{
-    display: none;
-  }
 }
