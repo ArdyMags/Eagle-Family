@@ -548,6 +548,17 @@ tbody td{
     height: 70px;
     object-fit: contain;
   }
+  /* TAMBAHIN INI BIAR WARNA TUNGGAKAN HILANG PAS PRINT */
+  .row-tunggakan {
+    background: white !important;
+    color: black !important;
+  }
+  
+  /* Biar warna IPL dkk tetep ke-print */
+    * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
 }
 
 /* =========================
