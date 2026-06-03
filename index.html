@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Master Data Warga + Iuran</title>
+<link rel="stylesheet" href="2-style.css">
+<script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+<body>
+<div class="watermarkp"><img src="Elang1.png" alt="Watermark"></div>
+
+
+<div class="fab-container">
+  <div id="jam-wib"></div>
+  <div class="fab-menu">
+    <button id="btnBackup" class="admin-only" onclick="backupData()">Backup</button>
+    <button id="btnTambah" class="admin-only" onclick="openTambahModal()">Tambah Data</button>
+    <button id="btnBayar" class="admin-only" onclick="openBayarModal()">Bayar</button>
+    <button id="btnExportExcel" class="admin-only" onclick="openExcelModal()">Export Excel</button>
+    <button id="btnExportPDF" class="admin-only" onclick="exportToPDF()">Export PDF</button>
+  </div>
+  <div class="fab-logo" onclick="toggleMenu()"><img src="Elang1.png" alt="Logo"></div>
+</div>
+
+<div id="loginModal" class="modal-overlay" style="display:none;">
+  <div class="modal">
+    <h3>Login Admin</h3>
+    <label>Password Admin</label>
+    <input type="password" id="adminPassword" placeholder="Masukkan password">
+    <div class="modal-actions">
+      <button class="btn save" onclick="prosesLogin()">Login</button>
+      <button class="btn delete" onclick="closeLoginModal()">Batal</button>
+    </div>
+  </div>
+</div>
+
+<div id="excelModal" class="modal-overlay" style="display:none;">
+  <div class="modal">
+    <h3>Export Excel</h3>
+
+    <label>Jenis Laporan</label>
+    <select id="excelJenis">
+      <option value="ketua">Untuk Ketua - Ada Nominal</option>
+      <option value="warga">Untuk Warga - Tanpa Nominal</option>
+    </select>
+
+    <label style="margin-top:15px;">Periode Bulan</label>
+    <select id="excelPeriode">
+      <option value="all">Semua 24 Bulan</option>
+      <option value="tahun_ini">Tahun Ini Saja</option>
+      <option value="6bulan">6 Bulan Terakhir</option>
+      <option value="custom">Pilih Manual</option>
+    </select>
+
+    <div id="customBulan" style="display:none; margin-top:10px;">
+      <label>Pilih Bulan:</label>
+      <div class="bulan-grid" id="excelBulanGrid"></div>
+    </div>
+
+    <label style="margin-top:15px;">
+      <input type="checkbox" id="excelWarna" checked> Export dengan warna
+    </label>
+
+    <label>
+      <input type="checkbox" id="excelTunggakan"> Hanya yang nunggak >= 3 bulan
+    </label>
+
+    <div class="modal-actions">
+      <button class="btn save" onclick="prosesExportExcel()">Download</button>
+      <button class="btn delete" onclick="closeExcelModal()">Batal</button>
+    </div>
+  </div>
+</div>
+
+<div class="spinner-overlay" id="spinner"><div class="spinner"></div></div>
+
+<h2>📋 MASTER DATA WARGA</h2>
+<input type="text" id="searchWarga" placeholder="Cari nama / NIK / blok..." onkeyup="filterWarga()" style="width:100%;max-width:400px;margin-bottom:15px;padding:10px 14px;border-radius:8px;border:1px solid #ccc;">
+<div class="card">
+  <table id="tableWarga">
+    <thead><tr>
+      <th>No KK</th><th>NIK</th><th>Nama</th><th>Jenis Kelamin</th><th>Tanggal Lahir</th>
+      <th>Agama</th><th>Status KK</th><th>Pekerjaan</th><th>Blok</th><th>No Rumah</th>
+      <th>Status Huni</th><th>Alamat</th><th>Aksi</th>
+    </tr></thead>
+    <tbody id="bodyWarga"></tbody>
+  </table>
+</div>
+
+<section>
+<h2>💰 REKAP IURAN</h2>
+<div id="summaryBox" style="background:#ffffff00;padding:2px;border-radius:12px;margin-bottom:15px;box-shadow:0 2px 10px rgba(0,0,0,0.08);">
+  <h3>Total Tunggakan: <span id="totalTunggakan">Rp 0</span></h3>
+</div>
+
+<div id="printArea">
+  <div class="print-header">
+    <img id="logoPrint" src="Elang1.png" alt="Logo">
+    <div class="print-title-wrap">
+      <h1>REKAP IURAN GG ELANG 1</h1>
+      <p>Periode 24 Bulan</p>
+      <div class="line"></div>
+    </div>
+  </div>
+  <div class="card">
+    <table id="tableIuran">
+      <thead id="headerIuran"></thead>
+      <tbody id="bodyIuran"></tbody>
+    </table>
+  </div>
+</div>
+</section>
+
+<div class="modal-overlay" id="bayarModal">
+  <div class="modal">
+    <h3>💳 Input Pembayaran Iuran</h3>
+    <label>Kepala Keluarga:</label><select id="selectKK" onchange="loadBulanBayar()"></select>
+    <label>Tahun:</label><select id="selectTahun" onchange="loadBulanBayar()"></select>
+    <div id="bulanContainer"></div>
+    <div style="margin-top:15px; padding-top:15px; border-top:1px solid #e5e7eb;">
+      <label>Iuran Sekali Bayar:</label>
+      <div style="display:flex; gap:15px; margin-top:8px;">
+        <div class="bulan-item" style="flex:1;">
+          <input type="checkbox" id="cekPos"><label for="cekPos" id="labelPos">Iuran POS<br><small>Rp 100.000</small></label>
+        </div>
+        <div class="bulan-item" style="flex:1;">
+          <input type="checkbox" id="cekFasum"><label for="cekFasum" id="labelFasum">Iuran FASUM<br><small>Rp 100.000</small></label>
+        </div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn save" onclick="simpanBayar()">Simpan</button>
+      <button class="btn delete" onclick="closeBayarModal()">Batal</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="tambahModal">
+  <div class="modal">
+    <h3>➕ Tambah Data Warga</h3>
+    <label>No KK:</label><input type="text" id="t_no_kk">
+    <label>NIK:</label><input type="text" id="t_nik">
+    <label>Nama:</label><input type="text" id="t_nama">
+    <label>Jenis Kelamin:</label><select id="t_jk"></select>
+    <label>Tanggal Lahir:</label><input type="date" id="t_tgl">
+    <label>Agama:</label><select id="t_agama"></select>
+    <label>Status Keluarga:</label><select id="t_status"></select>
+    <label>Pekerjaan:</label><select id="t_kerja"></select>
+    <label>Blok:</label><input type="text" id="t_blok">
+    <label>No Rumah:</label><input type="text" id="t_rumah">
+    <label>Status Huni:</label><select id="t_huni"></select>
+    <label>Alamat:</label><input type="text" id="t_alamat">
+    <div class="modal-actions">
+      <button class="btn save" onclick="simpanTambah()">Simpan</button>
+      <button class="btn delete" onclick="closeTambahModal()">Batal</button>
+    </div>
+  </div>
+</div>
+
+<script src="2-script.js"></script>
+</body>
+</html>
