@@ -534,7 +534,7 @@ tbody td{
     display: none !important;
   }
   body {
-    background: white;
+    background: white !important;
     padding: 0;
   }
   #printArea .card {
@@ -549,17 +549,17 @@ tbody td{
     object-fit: contain;
   }
   
-  /* FORCE PRINT WARNA DULU */
     * {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
   
-  /* BARU TIMPA WARNA TUNGGAKAN - TARUH PALING BAWAH */
-  .row-tunggakan,
-  .row-tunggakan td,
-  #tableIuran tr.row-tunggakan,
-  #tableIuran tr.row-tunggakan > td {
+  /* HAJAR SEMUA WARNA TUNGGAKAN - PALING BAWAH */
+  html body .row-tunggakan,
+  html body .row-tunggakan td,
+  html body #tableIuran tr.row-tunggakan,
+  html body #tableIuran tr.row-tunggakan > td,
+  html body #tableIuran tbody tr.row-tunggakan {
     background: #fff !important;
     background-color: #fff !important;
     color: #000 !important;
