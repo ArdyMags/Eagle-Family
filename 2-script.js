@@ -636,8 +636,13 @@ async function exportToPDF(){
       useCORS: true, 
       backgroundColor: '#ffffff', 
       allowTaint: true,
-      // INI KUNCINYA: Suntik CSS pas clone
+      
+      // TARUH onclone DI SINI
       onclone: (clonedDoc, clonedElement) => {
+        // 1. Force header print muncul
+        clonedElement.querySelector('.print-header').style.display = 'flex';
+        
+        // 2. Matin warna tunggakan
         const style = clonedDoc.createElement('style');
         style.innerHTML = `
           .row-tunggakan, .row-tunggakan td {
@@ -645,13 +650,41 @@ async function exportToPDF(){
             background-color: #fff !important;
             color: #000 !important;
           }
+          * {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
         `;
         clonedDoc.head.appendChild(style);
-        clonedElement.querySelector('.print-header').style.display = 'flex';
+        
+        // 3. Hide kolom > 3 bulan ke depan
+        const today = new Date();
+        const maxDate = new Date(today.getFullYear(), today.getMonth() + 3, 1);
+        
+        const thList = clonedElement.querySelectorAll('thead th[data-bulan]');
+        thList.forEach((th, index) => {
+          const bulanData = th.dataset.bulan; // format: "2026-01"
+          if(bulanData){
+            const colDate = new Date(bulanData + '-01');
+            if(colDate >= maxDate){
+              // Hide header
+              th.style.display = 'none';
+              
+              // Hide semua cell di kolom itu
+              const colIndex = index + 1; // nth-child mulai dari 1
+              clonedElement.querySelectorAll(`tbody tr`).forEach(tr => {
+                if(tr.children[colIndex - 1]) {
+                  tr.children[colIndex - 1].style.display = 'none';
+                }
+              });
+            }
+          }
+        });
       }
     });
     
     header.style.display = oldDisplay;
+    
     const imgData = canvas.toDataURL('image/png');
     const { jsPDF } = window.jspdf;
     const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
@@ -661,6 +694,7 @@ async function exportToPDF(){
     const imgHeight = (canvas.height * imgWidth) / canvas.width;
     pdf.addImage(imgData, 'PNG', margin, margin, imgWidth, imgHeight);
     pdf.save('Rekap_Iuran_GG_Elang_1.pdf');
+    
   }catch(err){
     console.error(err);
     alert('Gagal export PDF: ' + err.message);
