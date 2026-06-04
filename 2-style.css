@@ -239,18 +239,6 @@ body:not(.dark-mode) {
   background: var(--bg-tunggakan) !important;
   color: var(--text-tunggakan) !important;
 }
-@media (prefers-color-scheme: dark) {
-  .row-tunggakan {
-    background: #5c1a1a !important;
-    color: #ffcccc !important;
-  }
-}
-@media (prefers-color-scheme: light) {
-  .row-tunggakan {
-    background: #ffe5e5 !important;
-    color: #000 !important;
-  }
-}
 .dark-mode{
   background:#111827;
   color:white;
