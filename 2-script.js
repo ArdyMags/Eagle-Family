@@ -169,7 +169,10 @@ function renderTableIuran(sortedArr = null){
   if(sortedArr) arr = sortedArr;
 
   let header = `<tr><th onclick="sortTableIuran('blok')">Blok ⇅</th><th onclick="sortTableIuran('no_rumah')">No Rumah ⇅</th><th onclick="sortTableIuran('nama')">Kepala Keluarga ⇅</th><th onclick="sortTableIuran('status_huni')">Status Huni ⇅</th><th>POS</th><th>FASUM</th>`;
-  bulanList.forEach(b=>{ header += `<th>${b.bulan}'${String(b.tahun).slice(2)}</th>`; });
+  bulanList.forEach(b=>{
+  const bulanAngka = String(b.idx + 1).padStart(2, '0'); // idx 0=Jan=01
+  header += `<th data-bulan="${b.tahun}-${bulanAngka}">${b.bulan}'${String(b.tahun).slice(2)}</th>`;
+  });
   header += `</tr>`;
   document.getElementById("headerIuran").innerHTML = header;
 
