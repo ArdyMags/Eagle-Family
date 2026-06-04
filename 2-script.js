@@ -622,6 +622,16 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 async function exportToPDF(){
+  // Tanya dulu ada bukti TF atau ga
+  if(listBuktiTf.length === 0){
+    const mauUpload = confirm('Bukti transfer belum ada. Mau upload dulu sebelum export PDF?');
+    if(mauUpload){
+      // Trigger input file upload lu
+      document.getElementById('inputBuktiTf').click(); 
+      return; // Batal export, suruh upload dulu
+    }
+    // Kalo user pilih 'Cancel', lanjut export tanpa bukti TF
+  }
   showSpinner();
   try{
     const element = document.getElementById('printArea');
