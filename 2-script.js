@@ -625,8 +625,29 @@ async function exportToPDF(){
     const header = element.querySelector('.print-header');
     const oldDisplay = header.style.display;
     header.style.display = 'flex';
+    
     await new Promise(resolve => setTimeout(resolve, 50));
-    const canvas = await html2canvas(element,{ scale: 3, useCORS: true, backgroundColor: '#ffffff', allowTaint: true });
+    
+    const canvas = await html2canvas(element,{ 
+      scale: 3, 
+      useCORS: true, 
+      backgroundColor: '#ffffff', 
+      allowTaint: true,
+      // INI KUNCINYA: Suntik CSS pas clone
+      onclone: (clonedDoc, clonedElement) => {
+        const style = clonedDoc.createElement('style');
+        style.innerHTML = `
+          .row-tunggakan, .row-tunggakan td {
+            background: #fff !important;
+            background-color: #fff !important;
+            color: #000 !important;
+          }
+        `;
+        clonedDoc.head.appendChild(style);
+        clonedElement.querySelector('.print-header').style.display = 'flex';
+      }
+    });
+    
     header.style.display = oldDisplay;
     const imgData = canvas.toDataURL('image/png');
     const { jsPDF } = window.jspdf;
