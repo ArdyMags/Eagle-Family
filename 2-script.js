@@ -626,17 +626,21 @@ async function exportToPDF(){
   try{
     const element = document.getElementById('printArea');
     const header = element.querySelector('.print-header');
+    const buktiTfDiv = document.getElementById('buktiTf');
     const oldDisplay = header.style.display;
-    header.style.display = 'flex';
+    const oldDisplayBukti = buktiTfDiv.style.display;
     
-    await new Promise(resolve => setTimeout(resolve, 50));
+    header.style.display = 'flex';
+    if(listBuktiTf.length === 0) buktiTfDiv.style.display = 'none';
+    
+    await new Promise(resolve => setTimeout(resolve, 100));
     
     const canvas = await html2canvas(element,{ 
-      scale: 3, 
+      scale: 2, 
       useCORS: true, 
       backgroundColor: '#ffffff', 
       allowTaint: true,
-      // INI KUNCINYA: Suntik CSS pas clone
+      // onclone: semua modifikasi DOM taruh sini
       onclone: (clonedDoc, clonedElement) => {
         const style = clonedDoc.createElement('style');
         style.innerHTML = `
@@ -647,20 +651,48 @@ async function exportToPDF(){
           }
         `;
         clonedDoc.head.appendChild(style);
-        clonedElement.querySelector('.print-header').style.display = 'flex';
-      }
+        
+        const clonedHeader = clonedElement.querySelector('.print-header');
+        if(clonedHeader) clonedHeader.style.display = 'flex';
+        
+        // Pindahin if ini ke dalem onclone
+        if(listBuktiTf.length === 0){
+          const bukti = clonedElement.querySelector('#buktiTf');
+          if(bukti) bukti.remove();
+        }
+      } // <- kurung tutup onclone di sini
     });
     
+    // Balikin display asli
     header.style.display = oldDisplay;
+    buktiTfDiv.style.display = oldDisplayBukti;
+  
     const imgData = canvas.toDataURL('image/png');
     const { jsPDF } = window.jspdf;
     const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
     const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = pdf.internal.pageSize.getHeight();
     const margin = 10;
     const imgWidth = pdfWidth - (margin * 2);
     const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+    let heightLeft = imgHeight;
+    let position = margin;
+  
     pdf.addImage(imgData, 'PNG', margin, margin, imgWidth, imgHeight);
+    heightLeft -= (pdfHeight - margin * 2);
+
+    // Auto tambah halaman kalo kepanjangan
+    while (heightLeft > 0) {
+      position = heightLeft - imgHeight + margin; 
+      pdf.addPage();
+      pdf.addImage(imgData, 'PNG', margin, position, imgWidth, imgHeight);
+      heightLeft -= (pdfHeight - margin * 2);
+    } // <- kurung tutup while ketinggalan
+    
+    // pdf.save() HARUS di luar while
     pdf.save('Rekap_Iuran_GG_Elang_1.pdf');
+    
   }catch(err){
     console.error(err);
     alert('Gagal export PDF: ' + err.message);
@@ -820,6 +852,60 @@ document.getElementById('bayarModal').addEventListener('click', function(e){
 
 function toggleDarkMode(){
   document.body.classList.toggle('dark-mode');
+}
+let listBuktiTf = []; // array buat nyimpen base64
+
+function uploadBuktiTf(){
+  if (!cekAkses()) {
+    if (confirm('Akses ditolak. Login sebagai admin?')) openLoginModal();
+    return;
+  }
+  document.getElementById('inputBuktiTf').multiple = true; // INI PENTING
+  document.getElementById('inputBuktiTf').click();
+}
+
+function previewBuktiTf(event){
+  const files = event.target.files;
+  if(!files.length) return;
+
+  Array.from(files).forEach(file => {
+    const reader = new FileReader();
+    reader.onload = function(e){
+      listBuktiTf.push(e.target.result);
+      renderBuktiTf();
+    }
+    reader.readAsDataURL(file);
+  });
+  
+  // Reset input biar bisa upload file yang sama 2x
+  event.target.value = '';
+}
+
+function renderBuktiTf(){
+  const container = document.getElementById('listBuktiTf');
+  const divBukti = document.getElementById('buktiTf');
+  
+  if(listBuktiTf.length === 0){
+    divBukti.style.display = 'none';
+    return;
+  }
+
+  divBukti.style.display = 'block';
+  container.innerHTML = '';
+  
+  listBuktiTf.forEach((base64, index) => {
+    container.innerHTML += `
+      <div style="position: relative; width: 200px;">
+        <img src="${base64}" style="width: 100%; border: 1px solid #ccc; border-radius: 4px;">
+        <button onclick="hapusBuktiTf(${index})" style="position: absolute; top: 5px; right: 5px; background: red; color: white; border: none; border-radius: 50%; width: 24px; height: 24px; cursor: pointer;">×</button>
+      </div>
+    `;
+  });
+}
+
+function hapusBuktiTf(index){
+  listBuktiTf.splice(index, 1);
+  renderBuktiTf();
 }
 
 window.onload = () => {
