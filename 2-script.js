@@ -678,10 +678,9 @@ async function exportToPDF(){
           const bukti = clonedElement.querySelector('#buktiTf');
           if(bukti) bukti.remove();
         }
-      } // <- kurung tutup onclone di sini
+      }
     });
     
-    // Balikin display asli
     header.style.display = oldDisplay;
     buktiTfDiv.style.display = oldDisplayBukti;
   
@@ -700,15 +699,13 @@ async function exportToPDF(){
     pdf.addImage(imgData, 'PNG', margin, margin, imgWidth, imgHeight);
     heightLeft -= (pdfHeight - margin * 2);
 
-    // Auto tambah halaman kalo kepanjangan
     while (heightLeft > 0) {
       position = heightLeft - imgHeight + margin; 
       pdf.addPage();
       pdf.addImage(imgData, 'PNG', margin, position, imgWidth, imgHeight);
       heightLeft -= (pdfHeight - margin * 2);
-    } // <- kurung tutup while ketinggalan
+    }
     
-    // pdf.save() HARUS di luar while
     pdf.save('Rekap_Iuran_GG_Elang_1.pdf');
     
   }catch(err){
