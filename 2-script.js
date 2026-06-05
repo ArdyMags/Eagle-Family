@@ -1,4 +1,4 @@
-const apiURL = "https://script.google.com/macros/s/AKfycbzUdw6sOc74FdtSFxKOUA1Uu236TXdc_E_eelUaVIct6LErZAkGiY_0wUSchWyCkjYM/exec";
+  const apiURL = "https://script.google.com/macros/s/AKfycbzUdw6sOc74FdtSFxKOUA1Uu236TXdc_E_eelUaVIct6LErZAkGiY_0wUSchWyCkjYM/exec";
 const MASTER = {
   jenisKelamin: ["Laki-laki", "Perempuan"],
   agama: ["Islam", "Kristen", "Katholik", "Hindu", "Buddha"],
@@ -646,26 +646,34 @@ async function exportToPDF(){
     await new Promise(resolve => setTimeout(resolve, 100));
     
     const canvas = await html2canvas(element,{ 
-      scale: 2, 
+      scale: window.innerWidth < 768 ? 1.5 : 2, // HP pake 1.5 biar ga crash
       useCORS: true, 
       backgroundColor: '#ffffff', 
       allowTaint: true,
-      // onclone: semua modifikasi DOM taruh sini
+      windowWidth: 1200, // INI KUNCINYA: paksa render selebar 1200px walau di HP
+      scrollX: 0,
+      scrollY: -window.scrollY, // Fix posisi scroll HP
       onclone: (clonedDoc, clonedElement) => {
+        // Paksa lebar tabel biar ga wrap
+        clonedElement.style.width = '1200px';
+        clonedElement.querySelector('.card').style.width = '100%';
+        clonedElement.querySelector('#tableIuran').style.minWidth = '1000px';
+        
         const style = clonedDoc.createElement('style');
         style.innerHTML = `
+          * { font-size: 12px !important; } /* Kunci font biar ga auto-resize */
           .row-tunggakan, .row-tunggakan td {
             background: #fff !important;
             background-color: #fff !important;
             color: #000 !important;
           }
+          body { width: 1200px !important; }
         `;
         clonedDoc.head.appendChild(style);
         
         const clonedHeader = clonedElement.querySelector('.print-header');
         if(clonedHeader) clonedHeader.style.display = 'flex';
         
-        // Pindahin if ini ke dalem onclone
         if(listBuktiTf.length === 0){
           const bukti = clonedElement.querySelector('#buktiTf');
           if(bukti) bukti.remove();
