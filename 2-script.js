@@ -622,46 +622,62 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 async function exportToPDF(){
-  // Tanya dulu ada bukti TF atau ga
   if(listBuktiTf.length === 0){
     const mauUpload = confirm('Bukti transfer belum ada. Mau upload dulu sebelum export PDF?');
     if(mauUpload){
-      // Trigger input file upload lu
       document.getElementById('inputBuktiTf').click(); 
-      return; // Batal export, suruh upload dulu
+      return;
     }
-    // Kalo user pilih 'Cancel', lanjut export tanpa bukti TF
   }
+  
   showSpinner();
   try{
     const element = document.getElementById('printArea');
     const header = element.querySelector('.print-header');
     const buktiTfDiv = document.getElementById('buktiTf');
+    const tableWrapper = document.querySelector('.table-responsive'); // Tambah ini
+    
+    // Simpen state awal
     const oldDisplay = header.style.display;
     const oldDisplayBukti = buktiTfDiv.style.display;
+    const oldScrollLeft = tableWrapper ? tableWrapper.scrollLeft : 0; // Tambah ini
+    const oldScrollTop = window.scrollY; // Tambah ini
+    
+    // Paksa scroll ke kiri atas dulu
+    if(tableWrapper) tableWrapper.scrollLeft = 0; // Tambah ini
+    window.scrollTo(0, 0); // Tambah ini
     
     header.style.display = 'flex';
     if(listBuktiTf.length === 0) buktiTfDiv.style.display = 'none';
     
-    await new Promise(resolve => setTimeout(resolve, 100));
+    await new Promise(resolve => setTimeout(resolve, 150)); // naikin delay dikit biar scroll kelar
     
     const canvas = await html2canvas(element,{ 
-      scale: window.innerWidth < 768 ? 1.5 : 2, // HP pake 1.5 biar ga crash
+      scale: window.innerWidth < 768 ? 1.5 : 2,
       useCORS: true, 
       backgroundColor: '#ffffff', 
       allowTaint: true,
-      windowWidth: 1200, // INI KUNCINYA: paksa render selebar 1200px walau di HP
+      windowWidth: 1200,
       scrollX: 0,
-      scrollY: -window.scrollY, // Fix posisi scroll HP
+      scrollY: 0, // Ganti jadi 0 aja, udah kita scroll manual di atas
       onclone: (clonedDoc, clonedElement) => {
-        // Paksa lebar tabel biar ga wrap
+        // Paksa overflow visible biar ga kepotong
+        const cloneWrapper = clonedDoc.querySelector('.table-responsive');
+        if(cloneWrapper) {
+          cloneWrapper.style.overflow = 'visible';
+          cloneWrapper.style.overflowX = 'visible';
+          cloneWrapper.scrollLeft = 0;
+        }
+        
         clonedElement.style.width = '1200px';
         clonedElement.querySelector('.card').style.width = '100%';
-        clonedElement.querySelector('#tableIuran').style.minWidth = '1000px';
+        clonedElement.querySelector('#tableIuran').style.minWidth = '1200px'; // samain 1200px
         
         const style = clonedDoc.createElement('style');
         style.innerHTML = `
-          * { font-size: 12px !important; } /* Kunci font biar ga auto-resize */
+          * { font-size: 10px !important; } /* kecilin dikit biar muat */
+          .table-responsive { overflow: visible !important; }
+          td, th { padding: 3px !important; white-space: nowrap; }
           .row-tunggakan, .row-tunggakan td {
             background: #fff !important;
             background-color: #fff !important;
@@ -681,6 +697,9 @@ async function exportToPDF(){
       }
     });
     
+    // Balikin semua ke posisi awal
+    if(tableWrapper) tableWrapper.scrollLeft = oldScrollLeft; // Tambah ini
+    window.scrollTo(0, oldScrollTop); // Tambah ini
     header.style.display = oldDisplay;
     buktiTfDiv.style.display = oldDisplayBukti;
   
