@@ -643,29 +643,18 @@ async function exportToPDF(){
     
     await new Promise(resolve => setTimeout(resolve, 100));
     
-    const canvas = await html2canvas(element,{ 
-      scale: window.innerWidth < 768 ? 1.5 : 2, // HP pake 1.5 biar ga crash
+    const canvas = await html2canvas(element, { 
+      scale: 2,
       useCORS: true, 
-      backgroundColor: '#ffffff', 
-      allowTaint: true,
-      windowWidth: 1200, // INI KUNCINYA: paksa render selebar 1200px walau di HP
-      scrollX: 0,
-      scrollY: -window.scrollY, // Fix posisi scroll HP
+      backgroundColor: '#ffffff',
       onclone: (clonedDoc, clonedElement) => {
-        // Paksa lebar tabel biar ga wrap
-        clonedElement.style.width = '1200px';
-        clonedElement.querySelector('.card').style.width = '100%';
-        clonedElement.querySelector('#tableIuran').style.minWidth = '1000px';
-        
         const style = clonedDoc.createElement('style');
         style.innerHTML = `
-          * { font-size: 12px !important; } /* Kunci font biar ga auto-resize */
           .row-tunggakan, .row-tunggakan td {
             background: #fff !important;
             background-color: #fff !important;
             color: #000 !important;
           }
-          body { width: 1200px !important; }
         `;
         clonedDoc.head.appendChild(style);
         
@@ -694,7 +683,7 @@ async function exportToPDF(){
     let heightLeft = imgHeight;
     let position = margin;
   
-    pdf.addImage(imgData, 'PNG', margin, margin, imgWidth, imgHeight);
+    pdf.addImage(imgData, 'PNG', margin, position, imgWidth, imgHeight);
     heightLeft -= (pdfHeight - margin * 2);
 
     while (heightLeft > 0) {
@@ -706,10 +695,10 @@ async function exportToPDF(){
     
     pdf.save('Rekap_Iuran_GG_Elang_1.pdf');
     
-  }catch(err){
+  } catch(err) {
     console.error(err);
     alert('Gagal export PDF: ' + err.message);
-  }finally{
+  } finally {
     hideSpinner();
   }
 }
