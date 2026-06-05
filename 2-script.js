@@ -643,17 +643,59 @@ async function exportToPDF(){
     
     await new Promise(resolve => setTimeout(resolve, 100));
     
+    // [DITAMBAH] Detect device buat bedain scale
+    const isMobile = window.innerWidth < 768 || /Android|iPhone|iPad/i.test(navigator.userAgent);
+    
     const canvas = await html2canvas(element, { 
-      scale: 2,
+      scale: isMobile ? 1.5 : 2, // [DIGANTI] HP pake 1.5 biar ga crash, Web 2 biar tajam
       useCORS: true, 
       backgroundColor: '#ffffff',
+      windowWidth: 1200, // [DITAMBAH] Kunci #1: Paksa semua device render selebar 1200px
+      scrollX: 0, // [DITAMBAH] Fix posisi scroll
+      scrollY: -window.scrollY, // [DITAMBAH] Fix posisi scroll HP
       onclone: (clonedDoc, clonedElement) => {
+        // [DITAMBAH] Hapus semua style dark mode & media query bawaan lu
+        clonedDoc.querySelectorAll('style').forEach(style => {
+          if(style.innerHTML.includes('prefers-color-scheme') || style.innerHTML.includes('@media')){
+            style.remove();
+          }
+        });
+
+        // [DITAMBAH] Paksa lebar element yg di-clone
+        clonedElement.style.width = '1200px';
+        clonedElement.style.padding = '10px';
+        
+        // [DIGANTI] Style ditimpa total biar HP & Web sama
         const style = clonedDoc.createElement('style');
         style.innerHTML = `
+          * { 
+            font-size: 11px !important; 
+            font-family: Arial, sans-serif !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
+          body { 
+            padding: 0 !important; 
+            padding-top: 0 !important; 
+            background: #fff !important;
+          }
+          table { 
+            width: 1200px !important; 
+            border-spacing: 4px !important; /* Kecilin biar muat */
+          }
+          .card { 
+            max-height: none !important; 
+            overflow: visible !important;
+            box-shadow: none !important;
+            padding: 0 !important;
+          }
           .row-tunggakan, .row-tunggakan td {
             background: #fff !important;
             background-color: #fff !important;
             color: #000 !important;
+          }
+          .fab-container, .modal-overlay, h2, .spinner-overlay, .watermarkp, #jam-wib {
+            display: none !important; /* [DITAMBAH] Sembunyiin jam juga */
           }
         `;
         clonedDoc.head.appendChild(style);
@@ -676,7 +718,7 @@ async function exportToPDF(){
     const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
     const pdfWidth = pdf.internal.pageSize.getWidth();
     const pdfHeight = pdf.internal.pageSize.getHeight();
-    const margin = 10;
+    const margin = isMobile ? 8 : 10; // [DIGANTI] Margin lebih kecil di HP
     const imgWidth = pdfWidth - (margin * 2);
     const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
