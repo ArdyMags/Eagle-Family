@@ -631,76 +631,63 @@ async function exportToPDF(){
   }
   
   showSpinner();
-  let tempDiv = null;
   try{
-    const printArea = document.getElementById('printArea');
+    const element = document.getElementById('printArea');
+    const header = element.querySelector('.print-header');
+    const buktiTfDiv = document.getElementById('buktiTf');
+    const oldDisplay = header.style.display;
+    const oldDisplayBukti = buktiTfDiv.style.display;
     
-    // 1. CLONE printArea ke luar body biar bebas dari overflow
-    tempDiv = printArea.cloneNode(true);
-    tempDiv.style.position = 'absolute';
-    tempDiv.style.left = '-9999px';
-    tempDiv.style.top = '0';
-    tempDiv.style.width = '1200px';
-    document.body.appendChild(tempDiv);
+    header.style.display = 'flex';
+    if(listBuktiTf.length === 0) buktiTfDiv.style.display = 'none';
     
-    // 2. Beresin clone-nya
-    const header = tempDiv.querySelector('.print-header');
-    const buktiTfDiv = tempDiv.querySelector('#buktiTf');
-    const tableWrapper = tempDiv.querySelector('.table-responsive');
-    const table = tempDiv.querySelector('#tableIuran');
+    await new Promise(resolve => setTimeout(resolve, 100));
     
-    if(header) header.style.display = 'flex';
-    if(listBuktiTf.length === 0 && buktiTfDiv) buktiTfDiv.remove();
-    
-    // Jebolin semua yg motong
-    if(tableWrapper) {
-      tableWrapper.style.overflow = 'visible';
-      tableWrapper.style.overflowX = 'visible';
-      tableWrapper.style.width = '100%';
-    }
-    if(table) {
-      table.style.minWidth = '1200px';
-      table.style.width = '1200px';
-    }
-    
-    // Kasih style khusus export
-    const style = document.createElement('style');
-    style.innerHTML = `
-      #printArea, #printArea * { 
-        font-size: 10px !important; 
-        box-sizing: border-box;
-      }
-      #printArea td, #printArea th { 
-        padding: 3px !important; 
-        white-space: nowrap !important; 
-        border: 1px solid #000 !important;
-      }
-      #printArea .row-tunggakan, #printArea .row-tunggakan td {
-        background: #fff !important;
-        color: #000 !important;
-      }
-    `;
-    tempDiv.appendChild(style);
-    
-    await new Promise(resolve => setTimeout(resolve, 200));
-    
-    // 3. Render si clone, bukan yg asli
-    const canvas = await html2canvas(tempDiv,{ 
-      scale: 1.5,
+    const canvas = await html2canvas(element,{ 
+      scale: window.innerWidth < 768 ? 1.5 : 2, // HP pake 1.5 biar ga crash
       useCORS: true, 
-      backgroundColor: '#ffffff',
-      width: 1200, // pake width, bukan windowWidth
-      windowWidth: 1200,
+      backgroundColor: '#ffffff', 
+      allowTaint: true,
+      windowWidth: 1200, // INI KUNCINYA: paksa render selebar 1200px walau di HP
       scrollX: 0,
-      scrollY: 0
+      scrollY: -window.scrollY, // Fix posisi scroll HP
+      onclone: (clonedDoc, clonedElement) => {
+        // Paksa lebar tabel biar ga wrap
+        clonedElement.style.width = '1200px';
+        clonedElement.querySelector('.card').style.width = '100%';
+        clonedElement.querySelector('#tableIuran').style.minWidth = '1000px';
+        
+        const style = clonedDoc.createElement('style');
+        style.innerHTML = `
+          * { font-size: 12px !important; } /* Kunci font biar ga auto-resize */
+          .row-tunggakan, .row-tunggakan td {
+            background: #fff !important;
+            background-color: #fff !important;
+            color: #000 !important;
+          }
+          body { width: 1200px !important; }
+        `;
+        clonedDoc.head.appendChild(style);
+        
+        const clonedHeader = clonedElement.querySelector('.print-header');
+        if(clonedHeader) clonedHeader.style.display = 'flex';
+        
+        if(listBuktiTf.length === 0){
+          const bukti = clonedElement.querySelector('#buktiTf');
+          if(bukti) bukti.remove();
+        }
+      }
     });
+    
+    header.style.display = oldDisplay;
+    buktiTfDiv.style.display = oldDisplayBukti;
   
     const imgData = canvas.toDataURL('image/png');
     const { jsPDF } = window.jspdf;
     const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
     const pdfWidth = pdf.internal.pageSize.getWidth();
     const pdfHeight = pdf.internal.pageSize.getHeight();
-    const margin = 8;
+    const margin = 10;
     const imgWidth = pdfWidth - (margin * 2);
     const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
@@ -723,8 +710,6 @@ async function exportToPDF(){
     console.error(err);
     alert('Gagal export PDF: ' + err.message);
   }finally{
-    // 4. Hapus clone-nya, balikin DOM normal
-    if(tempDiv) tempDiv.remove();
     hideSpinner();
   }
 }
