@@ -572,8 +572,8 @@ if (pakeWarna) {
   ws_data.push([{v: 'Dana Sosial : 5,000', t: 's'}]);
   ws_data.push([{v: 'Pengajian : 5,000', t: 's'}]);
   // YG INI BENERIN KURUNG KURAWALNYA
-  ws_data.push([{v: 'Total IPL : 65,000', t: 's', r: [{t: 'Total IPL : ', s: {}}, {t: '65,000', s: {font: {bold: true}}}]}]);
-  ws_data.push([{v: 'Total IPL Nonis : 60,000', t: 's', r: [{t: 'Total IPL Nonis : ', s: {}}, {t: '60,000', s: {font: {bold: true}}}]}]);
+  ws_data.push([{v: 'Total IPL : 65,000', t: 's', s: {font: {sz: 11}}, r: [{t: 'Total IPL : ', s: {font: {sz: 11}}}, {t: '65,000', s: {font: {sz: 11, bold: true}}}]}]);
+  ws_data.push([{v: 'Total IPL Nonis : 60,000', t: 's', s: {font: {sz: 11}}, r: [{t: 'Total IPL Nonis : ', s: {font: {sz: 11}}}, {t: '60,000', s: {font: {sz: 11, bold: true}}}]}]);
 }
 
       const ws = XLSX.utils.aoa_to_sheet(ws_data);
