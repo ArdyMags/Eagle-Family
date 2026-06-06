@@ -4,7 +4,7 @@ const MASTER = {
   agama: ["Islam", "Kristen", "Katholik", "Hindu", "Buddha"],
   statusKeluarga: ["Kepala Keluarga", "Istri", "Anak", "Famili Lain"],
   pekerjaan: ["Belum/Tidak Bekerja", "Ibu Rumah Tangga", "Pelajar/Mahasiswa", "Pensiunan", "Karyawan Swasta", "Pegawai Negeri Sipil", "Pegawai Honorer", "Wiraswasta", "Pedagang", "Petani/Pekebun", "Nelayan", "Buruh Harian Lepas", "Sopir", "Guru", "Dokter", "Bidan", "Perawat", "TNI", "Polri", "Lainnya"],
-  statusHuni: ["huni", "belum huni"]
+  statusHuni: ["huni", "huni<sewa>", "belum huni"]
 };
 // === 1. PALING ATAS: CONFIG & GLOBAL VARIABLE ===
 let USER_ACCESS = 'viewer'; // ganti 'admin' kalo punya akses
@@ -719,16 +719,27 @@ function loadBulanBayar(){
   let container = document.getElementById('bulanContainer');
   let bulanList = ["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];
   let html = '<label>Pilih Bulan yang Dibayar:</label><div class="bulan-grid">';
+
+  let anggotaKK = rawData.filter(r => String(r.no_kk).trim() === String(kk).trim());
+  let statusHuni = 'belum huni';
+  if(anggotaKK.length > 0) statusHuni = (anggotaKK[0].status_huni || 'belum huni').toLowerCase();
+
+  // huni & huni<sewa> = IPL
+  let jenisYangDicek = 'KAS';
+  if(statusHuni === 'huni' || statusHuni === 'huni<sewa>') jenisYangDicek = 'IPL';
+
   bulanList.forEach(bulan=>{
-    let anggotaKK = rawData.filter(r => String(r.no_kk).trim()===String(kk).trim());
-    let statusHuni = 'belum huni';
-    if(anggotaKK.length > 0) statusHuni = anggotaKK[0].status_huni || 'belum huni';
-    let jenisYangDicek = String(statusHuni).toLowerCase()==='huni'? 'IPL' : 'KAS';
-    let bayar = iuranData.find(i=> String(i.no_kk).trim()===String(kk).trim() && String(i.bulan).trim().toLowerCase()===bulan.toLowerCase() && String(i.tahun).trim()===String(tahun).trim() && String(i.jenis).toUpperCase()===jenisYangDicek);
+    let bayar = iuranData.find(i=>
+      String(i.no_kk).trim() === String(kk).trim() &&
+      String(i.bulan).trim().toLowerCase() === bulan.toLowerCase() &&
+      String(i.tahun).trim() === String(tahun).trim() &&
+      String(i.jenis).toUpperCase() === jenisYangDicek
+    );
     let sudahBayar =!!bayar;
     let checked = sudahBayar? 'checked' : '';
     let nominalVal = bayar? bayar.nominal : '';
     let labelText = sudahBayar? `Lunas - ${bulan} (${jenisYangDicek})` : `${bulan} (${jenisYangDicek})`;
+
     html += `<div class="bulan-item">
       <input type="checkbox" id="bulan_${bulan}" ${checked} ${sudahBayar? 'disabled' : ''} data-bulan="${bulan}" onchange="toggleNominal('${bulan}')">
       <label for="bulan_${bulan}">${labelText}</label>
@@ -760,7 +771,8 @@ function simpanBayar(){
   let tahun = document.getElementById('selectTahun').value;
   let anggotaKK = rawData.filter(r => String(r.no_kk).trim() === String(kk).trim());
   let statusHuni = anggotaKK[0]?.status_huni || 'belum huni';
-  let jenis = String(statusHuni).toLowerCase() === 'huni'? 'IPL' : 'KAS';
+  let jenis = 'KAS';
+  if(statusHuni === 'huni' || statusHuni === 'huni<sewa>') jenis = 'IPL';
   let dataUpdate = [], valid = true;
   document.querySelectorAll('#bulanContainer input[type=checkbox]').forEach(cb=>{
     if(cb.checked &&!cb.disabled){
