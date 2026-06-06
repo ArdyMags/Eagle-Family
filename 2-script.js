@@ -566,14 +566,17 @@ function prosesExportExcel(){
 
 // TAMBAH KETERANGAN IURAN IPL DI BAWAH
 if (pakeWarna) {
-  ws_data.push([]); // Baris kosong buat jarak
+  ws_data.push([]); 
+  ws_data.push([]); 
   ws_data.push([{v: 'Keterangan Iuran IPL:', s: {font: {bold: true, sz: 12}}}]);
-  ws_data.push([{v: 'Sampah', t: 's'}, {v: 15000, t: 'n', z: '#,##0'}]);
-  ws_data.push([{v: 'Keamanan', t: 's'}, {v: 30000, t: 'n', z: '#,##0'}]);
-  ws_data.push([{v: 'Kas', t: 's'}, {v: 10000, t: 'n', z: '#,##0'}]);
-  ws_data.push([{v: 'Dana Sosial', t: 's'}, {v: 5000, t: 'n', z: '#,##0'}]);
-  ws_data.push([{v: 'Pengajian', t: 's'}, {v: 5000, t: 'n', z: '#,##0'}]);
-  ws_data.push([{v: 'Total IPL Normal', t: 's', s: {font: {bold: true}}}, {v: 65000, t: 'n', z: '#,##0', s: {font: {bold: true}}}]);
+  ws_data.push([{v: 'Sampah : 15,000', t: 's'}]);
+  ws_data.push([{v: 'Keamanan : 30,000', t: 's'}]);
+  ws_data.push([{v: 'Kas : 10,000', t: 's'}]);
+  ws_data.push([{v: 'Dana Sosial : 5,000', t: 's'}]);
+  ws_data.push([{v: 'Pengajian : 5,000', t: 's'}]);
+// Yang total pake rich text biar angka doang bold
+  ws_data.push([{v: 'Total IPL : 65,000', t: 's', r: [ // r = rich text runs{t: 'Total IPL : ', s: {}}, {t: '65,000', s: {font: {bold: true}}}]}]);
+  ws_data.push([{v: 'Total IPL Nonis : 60,000', t: 's', r: [{t: 'Total IPL Nonis : ', s: {}}, {t: '60,000', s: {font: {bold: true}}}]}]);
 }
 
       const ws = XLSX.utils.aoa_to_sheet(ws_data);
