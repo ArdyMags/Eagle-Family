@@ -631,6 +631,24 @@ async function exportToPDF(){
     const buktiTfDiv = document.getElementById('buktiTf');
     const oldDisplay = header.style.display;
     const oldDisplayBukti = buktiTfDiv.style.display;
+
+    // INJECT KETERANGAN IPL SEMENTARA
+    const ketDiv = document.createElement('div');
+    ketDiv.id = 'tempKetIPL';
+    ketDiv.style.marginTop = '15px';
+    ketDiv.style.borderTop = '1px solid #ddd'; // TAMBAH INI
+    ketDiv.style.paddingTop = '10px'; // TAMBAH INI
+    ketDiv.innerHTML = `
+      <h3 style="font-size: 14px; margin-bottom: 5px;">Keterangan Iuran IPL:</h3>
+      <p style="margin: 2px 0; font-size: 11px;">Sampah : 15,000</p>
+      <p style="margin: 2px 0; font-size: 11px;">Keamanan : 30,000</p>
+      <p style="margin: 2px 0; font-size: 11px;">Kas : 10,000</p>
+      <p style="margin: 2px 0; font-size: 11px;">Dana Sosial : 5,000</p>
+      <p style="margin: 2px 0; font-size: 11px;">Pengajian : 5,000</p>
+      <p style="margin: 2px 0; font-size: 11px;">Total IPL : <strong>65,000</strong></p>
+      <p style="margin: 2px 0; font-size: 11px;">Total IPL Nonis : <strong>60,000</strong></p>
+    `;
+    element.appendChild(ketDiv);
     
     header.style.display = 'flex';
     if(listBuktiTf.length === 0) buktiTfDiv.style.display = 'none';
@@ -661,7 +679,8 @@ async function exportToPDF(){
         }
       }
     });
-    
+      
+    element.removeChild(ketDiv);
     header.style.display = oldDisplay;
     buktiTfDiv.style.display = oldDisplayBukti;
   
