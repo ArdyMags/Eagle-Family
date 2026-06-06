@@ -1,4 +1,4 @@
-  const apiURL = "https://script.google.com/macros/s/AKfycbzUdw6sOc74FdtSFxKOUA1Uu236TXdc_E_eelUaVIct6LErZAkGiY_0wUSchWyCkjYM/exec";
+const apiURL = "https://script.google.com/macros/s/AKfycbzUdw6sOc74FdtSFxKOUA1Uu236TXdc_E_eelUaVIct6LErZAkGiY_0wUSchWyCkjYM/exec";
 const MASTER = {
   jenisKelamin: ["Laki-laki", "Perempuan"],
   agama: ["Islam", "Kristen", "Katholik", "Hindu", "Buddha"],
@@ -7,22 +7,19 @@ const MASTER = {
   statusHuni: ["huni", "sewa", "belum huni"]
 };
 // === 1. PALING ATAS: CONFIG & GLOBAL VARIABLE ===
-let USER_ACCESS = 'viewer'; // ganti 'admin' kalo punya akses
-// Opsi: 'admin' = bisa semua, 'viewer' = read only
+let USER_ACCESS = 'viewer'; 
 
+// HAPUS FUNCTION cekAkses() YG DUPLIKAT, PAKE INI AJA
 function cekAkses() {
-  // Nanti bisa lu ganti pake login Google/email
-  // Misal: USER_ACCESS = localStorage.getItem('role') || 'viewer';
+  USER_ACCESS = localStorage.getItem('role') || 'viewer';
   return USER_ACCESS === 'admin';
 }
+
 function applyAkses() {
   const isAdmin = cekAkses();
   document.querySelectorAll('.admin-only').forEach(btn => {
-    // Jangan disable, biar bisa diklik
-    // btn.disabled = !isAdmin;  <-- HAPUS INI
-    
     if (!isAdmin) {
-      btn.classList.add('viewer-mode'); // Tambah class buat styling
+      btn.classList.add('viewer-mode');
       btn.title = 'Klik untuk login sebagai admin';
     } else {
       btn.classList.remove('viewer-mode');
@@ -574,8 +571,8 @@ if (pakeWarna) {
   ws_data.push([{v: 'Kas : 10,000', t: 's'}]);
   ws_data.push([{v: 'Dana Sosial : 5,000', t: 's'}]);
   ws_data.push([{v: 'Pengajian : 5,000', t: 's'}]);
-// Yang total pake rich text biar angka doang bold
-  ws_data.push([{v: 'Total IPL : 65,000', t: 's', r: [ // r = rich text runs{t: 'Total IPL : ', s: {}}, {t: '65,000', s: {font: {bold: true}}}]}]);
+  // YG INI BENERIN KURUNG KURAWALNYA
+  ws_data.push([{v: 'Total IPL : 65,000', t: 's', r: [{t: 'Total IPL : ', s: {}}, {t: '65,000', s: {font: {bold: true}}}]}]);
   ws_data.push([{v: 'Total IPL Nonis : 60,000', t: 's', r: [{t: 'Total IPL Nonis : ', s: {}}, {t: '60,000', s: {font: {bold: true}}}]}]);
 }
 
