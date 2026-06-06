@@ -639,14 +639,14 @@ async function exportToPDF(){
     ketDiv.style.borderTop = '1px solid #ddd'; // TAMBAH INI
     ketDiv.style.paddingTop = '10px'; // TAMBAH INI
     ketDiv.innerHTML = `
-      <h3 style="font-size: 13px; margin-bottom: 5px;">Keterangan Iuran IPL:</h3>
-      <p style="margin: 3px 0; font-size: 13px;">Sampah : Rp 15.000,-</p>
-      <p style="margin: 3px 0; font-size: 13px;">Keamanan : Rp 30,000,-</p>
-      <p style="margin: 3px 0; font-size: 13px;">Kas : Rp 10,000,-</p>
-      <p style="margin: 3px 0; font-size: 13px;">Dana Sosial : Rp 5,000,-</p>
-      <p style="margin: 3px 0; font-size: 13px;">Pengajian : Rp 5,000,-</p>
-      <p style="margin: 3px 0; font-size: 13px;">Total IPL : <strong>Rp 65,000,-</strong></p>
-      <p style="margin: 3px 0; font-size: 13px;">Total IPL Nonis : <strong>Rp 60,000,-</strong></p>
+      <h3 style="font-size: 15px; margin-bottom: 5px;">Keterangan Iuran IPL:</h3>
+      <p style="margin: 5px 0; font-size: 15px;">Sampah : Rp 15.000,-</p>
+      <p style="margin: 5px 0; font-size: 15px;">Keamanan : Rp 30,000,-</p>
+      <p style="margin: 5px 0; font-size: 15px;">Kas : Rp 10,000,-</p>
+      <p style="margin: 5px 0; font-size: 15px;">Dana Sosial : Rp 5,000,-</p>
+      <p style="margin: 5px 0; font-size: 15px;">Pengajian : Rp 5,000,-</p>
+      <p style="margin: 5px 0; font-size: 15px;">Total IPL : <strong>Rp 65,000,-</strong></p>
+      <p style="margin: 5px 0; font-size: 15px;">Total IPL Nonis : <strong>Rp 60,000,-</strong></p>
     `;
     element.appendChild(ketDiv);
     
