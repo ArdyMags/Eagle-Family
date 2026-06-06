@@ -566,14 +566,14 @@ if (pakeWarna) {
   ws_data.push([]); 
   ws_data.push([]); 
   ws_data.push([{v: 'Keterangan Iuran IPL:', s: {font: {bold: true, sz: 12}}}]);
-  ws_data.push([{v: 'Sampah : 15,000', t: 's'}]);
-  ws_data.push([{v: 'Keamanan : 30,000', t: 's'}]);
-  ws_data.push([{v: 'Kas : 10,000', t: 's'}]);
-  ws_data.push([{v: 'Dana Sosial : 5,000', t: 's'}]);
-  ws_data.push([{v: 'Pengajian : 5,000', t: 's'}]);
+  ws_data.push([{v: 'Sampah : Rp 15.000,-', t: 's'}]);
+  ws_data.push([{v: 'Keamanan : Rp 30.000,-', t: 's'}]);
+  ws_data.push([{v: 'Kas : Rp 10.000,-', t: 's'}]);
+  ws_data.push([{v: 'Dana Sosial : Rp 5.000,-', t: 's'}]);
+  ws_data.push([{v: 'Pengajian : Rp 5.000,-', t: 's'}]);
   // YG INI BENERIN KURUNG KURAWALNYA
-  ws_data.push([{v: 'Total IPL : 65,000', t: 's', s: {font: {sz: 11}}, r: [{t: 'Total IPL : ', s: {font: {sz: 11}}}, {t: '65,000', s: {font: {sz: 11, bold: true}}}]}]);
-  ws_data.push([{v: 'Total IPL Nonis : 60,000', t: 's', s: {font: {sz: 11}}, r: [{t: 'Total IPL Nonis : ', s: {font: {sz: 11}}}, {t: '60,000', s: {font: {sz: 11, bold: true}}}]}]);
+  ws_data.push([{v: 'Total IPL : Rp 65.000,-', t: 's', s: {font: {sz: 11}}, r: [{t: 'Total IPL : ', s: {font: {sz: 11}}}, {t: '65,000', s: {font: {sz: 11, bold: true}}}]}]);
+  ws_data.push([{v: 'Total IPL Nonis : Rp 60.000,-', t: 's', s: {font: {sz: 11}}, r: [{t: 'Total IPL Nonis : ', s: {font: {sz: 11}}}, {t: '60,000', s: {font: {sz: 11, bold: true}}}]}]);
 }
 
       const ws = XLSX.utils.aoa_to_sheet(ws_data);
