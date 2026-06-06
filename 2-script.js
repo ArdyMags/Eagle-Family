@@ -4,7 +4,7 @@ const MASTER = {
   agama: ["Islam", "Kristen", "Katholik", "Hindu", "Buddha"],
   statusKeluarga: ["Kepala Keluarga", "Istri", "Anak", "Famili Lain"],
   pekerjaan: ["Belum/Tidak Bekerja", "Ibu Rumah Tangga", "Pelajar/Mahasiswa", "Pensiunan", "Karyawan Swasta", "Pegawai Negeri Sipil", "Pegawai Honorer", "Wiraswasta", "Pedagang", "Petani/Pekebun", "Nelayan", "Buruh Harian Lepas", "Sopir", "Guru", "Dokter", "Bidan", "Perawat", "TNI", "Polri", "Lainnya"],
-  statusHuni: ["huni", "huni<Sewa>", "belum huni"]
+  statusHuni: ["huni", "belum huni"]
 };
 // === 1. PALING ATAS: CONFIG & GLOBAL VARIABLE ===
 let USER_ACCESS = 'viewer'; // ganti 'admin' kalo punya akses
@@ -719,29 +719,16 @@ function loadBulanBayar(){
   let container = document.getElementById('bulanContainer');
   let bulanList = ["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];
   let html = '<label>Pilih Bulan yang Dibayar:</label><div class="bulan-grid">';
-
-  // Ambil status huni sekali aja di luar loop biar ga ngulang2 filter
-  let anggotaKK = rawData.filter(r => String(r.no_kk).trim() === String(kk).trim());
-  let statusHuni = 'belum huni';
-  if(anggotaKK.length > 0) statusHuni = (anggotaKK[0].status_huni || 'belum huni').toLowerCase();
-
-  // Tentuin jenis iuran berdasarkan status
-  let jenisYangDicek = 'KAS'; // default
-  if(statusHuni === 'huni') jenisYangDicek = 'IPL';
-  else if(statusHuni === 'huni<sewa>') jenisYangDicek = 'IPL'; // sewa juga bayar IPL
-
   bulanList.forEach(bulan=>{
-    let bayar = iuranData.find(i=>
-      String(i.no_kk).trim() === String(kk).trim() &&
-      String(i.bulan).trim().toLowerCase() === bulan.toLowerCase() &&
-      String(i.tahun).trim() === String(tahun).trim() &&
-      String(i.jenis).toUpperCase() === jenisYangDicek
-    );
+    let anggotaKK = rawData.filter(r => String(r.no_kk).trim()===String(kk).trim());
+    let statusHuni = 'belum huni';
+    if(anggotaKK.length > 0) statusHuni = anggotaKK[0].status_huni || 'belum huni';
+    let jenisYangDicek = String(statusHuni).toLowerCase()==='huni'? 'IPL' : 'KAS';
+    let bayar = iuranData.find(i=> String(i.no_kk).trim()===String(kk).trim() && String(i.bulan).trim().toLowerCase()===bulan.toLowerCase() && String(i.tahun).trim()===String(tahun).trim() && String(i.jenis).toUpperCase()===jenisYangDicek);
     let sudahBayar =!!bayar;
     let checked = sudahBayar? 'checked' : '';
     let nominalVal = bayar? bayar.nominal : '';
     let labelText = sudahBayar? `Lunas - ${bulan} (${jenisYangDicek})` : `${bulan} (${jenisYangDicek})`;
-
     html += `<div class="bulan-item">
       <input type="checkbox" id="bulan_${bulan}" ${checked} ${sudahBayar? 'disabled' : ''} data-bulan="${bulan}" onchange="toggleNominal('${bulan}')">
       <label for="bulan_${bulan}">${labelText}</label>
@@ -751,7 +738,6 @@ function loadBulanBayar(){
   html += '</div>';
   container.innerHTML = html;
 
-  // Bagian POS & FASUM ga berubah
   let sudahBayarPos = iuranData.some(i => String(i.no_kk).trim()===kk && String(i.jenis).toUpperCase()==='POS' && String(i.bulan)==='POS');
   let sudahBayarFasum = iuranData.some(i => String(i.no_kk).trim()===kk && String(i.jenis).toUpperCase()==='FASUM' && String(i.bulan)==='FASUM');
   document.getElementById('cekPos').checked = sudahBayarPos;
