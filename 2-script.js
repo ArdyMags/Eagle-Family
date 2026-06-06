@@ -724,9 +724,10 @@ function loadBulanBayar(){
   let statusHuni = 'belum huni';
   if(anggotaKK.length > 0) statusHuni = (anggotaKK[0].status_huni || 'belum huni').toLowerCase();
 
-  // huni & sewa = IPL
+  // huni & huni<sewa> = IPL
   let jenisYangDicek = 'KAS';
-  if(statusHuni === 'huni' || statusHuni === 'sewa') jenisYangDicek = 'IPL';
+  let statusLower = statusHuni.toLowerCase();
+  if(statusLower === 'huni' || statusLower.includes('sewa')) jenisYangDicek = 'IPL';
 
   bulanList.forEach(bulan=>{
     let bayar = iuranData.find(i=>
@@ -772,7 +773,8 @@ function simpanBayar(){
   let anggotaKK = rawData.filter(r => String(r.no_kk).trim() === String(kk).trim());
   let statusHuni = anggotaKK[0]?.status_huni || 'belum huni';
   let jenis = 'KAS';
-  if(statusHuni === 'huni' || statusHuni === 'sewa') jenis = 'IPL';
+  let statusLower = statusHuni.toLowerCase();
+  if(statusLower === 'huni' || statusLower.includes('sewa')) jenis = 'IPL';
   let dataUpdate = [], valid = true;
   document.querySelectorAll('#bulanContainer input[type=checkbox]').forEach(cb=>{
     if(cb.checked &&!cb.disabled){
