@@ -4,7 +4,7 @@ const MASTER = {
   agama: ["Islam", "Kristen", "Katholik", "Hindu", "Buddha"],
   statusKeluarga: ["Kepala Keluarga", "Istri", "Anak", "Famili Lain"],
   pekerjaan: ["Belum/Tidak Bekerja", "Ibu Rumah Tangga", "Pelajar/Mahasiswa", "Pensiunan", "Karyawan Swasta", "Pegawai Negeri Sipil", "Pegawai Honorer", "Wiraswasta", "Pedagang", "Petani/Pekebun", "Nelayan", "Buruh Harian Lepas", "Sopir", "Guru", "Dokter", "Bidan", "Perawat", "TNI", "Polri", "Lainnya"],
-  statusHuni: ["huni", "huni<sewa>", "belum huni"]
+  statusHuni: ["huni", "huni-"sewa"", "belum huni"]
 };
 // === 1. PALING ATAS: CONFIG & GLOBAL VARIABLE ===
 let USER_ACCESS = 'viewer'; // ganti 'admin' kalo punya akses
@@ -724,9 +724,9 @@ function loadBulanBayar(){
   let statusHuni = 'belum huni';
   if(anggotaKK.length > 0) statusHuni = (anggotaKK[0].status_huni || 'belum huni').toLowerCase();
 
-  // huni & huni<sewa> = IPL
+  // huni & huni-"sewa" = IPL
   let jenisYangDicek = 'KAS';
-  if(statusHuni === 'huni' || statusHuni === 'huni<sewa>') jenisYangDicek = 'IPL';
+  if(statusHuni === 'huni' || statusHuni === 'huni-"sewa"') jenisYangDicek = 'IPL';
 
   bulanList.forEach(bulan=>{
     let bayar = iuranData.find(i=>
@@ -772,7 +772,7 @@ function simpanBayar(){
   let anggotaKK = rawData.filter(r => String(r.no_kk).trim() === String(kk).trim());
   let statusHuni = anggotaKK[0]?.status_huni || 'belum huni';
   let jenis = 'KAS';
-  if(statusHuni === 'huni' || statusHuni === 'huni<sewa>') jenis = 'IPL';
+  if(statusHuni === 'huni' || statusHuni === 'huni-"sewa"') jenis = 'IPL';
   let dataUpdate = [], valid = true;
   document.querySelectorAll('#bulanContainer input[type=checkbox]').forEach(cb=>{
     if(cb.checked &&!cb.disabled){
