@@ -561,7 +561,7 @@ function prosesExportExcel(){
         if (row.length > 0) ws_data.push(row);
       });
 
-// TAMBAH KETERANGAN IURAN IPL DI BAWAH
+//  KETERANGAN IURAN IPL DI BAWAH
 if (pakeWarna) {
   ws_data.push([]); 
   ws_data.push([]); 
@@ -579,7 +579,7 @@ if (pakeWarna) {
       const ws = XLSX.utils.aoa_to_sheet(ws_data);
       ws['!cols'] = headerRow.map(() => ({wch: 18}));
 
-      // HAPUS BAGIAN INI - GA ADA JUDUL TAMBAHAN LAGI
+      // HAPUS BAGIAN INI - GA ADA JUDUL AN LAGI
       // if (!tampilNominal) {
       //   XLSX.utils.sheet_add_aoa(ws, [["REKAP IURAN WARGA - NOMINAL DISENSOR"]], { origin: "A1" });
       //   ...
@@ -636,8 +636,8 @@ async function exportToPDF(){
     const ketDiv = document.createElement('div');
     ketDiv.id = 'tempKetIPL';
     ketDiv.style.marginTop = '15px';
-    ketDiv.style.borderTop = '1px solid #ddd'; // TAMBAH INI
-    ketDiv.style.paddingTop = '10px'; // TAMBAH INI
+    ketDiv.style.borderTop = '1px solid #ddd'; //  INI
+    ketDiv.style.paddingTop = '10px'; //  INI
     ketDiv.innerHTML = `
       <h3 style="font-size: 15px; margin-bottom: 5px;">Keterangan Iuran IPL:</h3>
       <p style="margin: 3px 0; font-size: 15px;">Sampah : Rp 15.000,-</p>
@@ -849,6 +849,7 @@ function closeTambahModal(){
 
 function simpanTambah(){
   let data = [{
+    id: Date.now().toString(), // TAMBAH INI
     no_kk: document.getElementById('t_no_kk').value,
     nik: document.getElementById('t_nik').value,
     nama: document.getElementById('t_nama').value,
