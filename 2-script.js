@@ -607,7 +607,7 @@ function renderDaftarBayarBulanIni() {
   const bulanArr = ["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];
   const tahunIni = now.getFullYear();
   const bulanIni = String(now.getMonth() + 1).padStart(2, '0');
-  const prefixID = `${tahunIni}.${bulanIni}`; // "2025.09"
+  const prefixID = `${tahunIni}${bulanIni}`; // "202509"
   const namaBulan = bulanArr[now.getMonth()];
 
   let bayarPerKK = {};
