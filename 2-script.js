@@ -613,22 +613,22 @@ function renderDaftarBayarBulanIni() {
   let bayarPerKK = {};
 
   iuranData.forEach(i => {
-    const idBayar = String(i.ID || '').trim();
+    const idBayar = String(i.ID || '').trim().replace(/\./g, ''); // hapus titik jaga2
     if (idBayar.startsWith(prefixID)) {
       const noKK = String(i.no_kk).trim();
       const nominal = Number(i.nominal) || 0;
 
-      if (!bayarPerKK) {
+      if (!bayarPerKK) { // TAMBAH 
         let kkData = rawData.find(w => String(w.no_kk).trim() === noKK);
         let kepala = kkData?
           (rawData.find(a => String(a.no_kk).trim() === noKK && String(a.status_keluarga||"").toLowerCase().includes("kepala")) || kkData)
           : null;
         let namaKK = kepala? `${kepala.blok} ${kepala.no_rumah} - ${kepala.nama}` : `KK ${noKK}`;
-        bayarPerKK = { total: 0, nama: namaKK, detail: [] };
+        bayarPerKK = { total: 0, nama: namaKK, detail: [] }; // TAMBAH 
       }
 
-      bayarPerKK.total += nominal;
-      bayarPerKK.detail.push(`${i.bulan} ${i.tahun}`);
+      bayarPerKK.total += nominal; // TAMBAH 
+      bayarPerKK.detail.push(`${i.bulan} ${i.tahun}`); // TAMBAH 
     }
   });
 
@@ -770,6 +770,7 @@ function generateIuranID() {
   const MM = String(now.getMonth() + 1).padStart(2, '0');
   const dd = String(now.getDate()).padStart(2, '0');
   const HH = String(now.getHours()).padStart(2, '0');
+  const ss = String(now.getSeconds()).padStart(2, '0');
   const ms = String(Math.floor(Math.random() * 1000)).padStart(3, '0');
   return `${yyyy}${MM}${dd}${HH}${ms}`;
 }
