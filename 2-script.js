@@ -613,7 +613,7 @@ function renderDaftarBayarBulanIni() {
   let bayarPerKK = {};
 
   iuranData.forEach(i => {
-    const idBayar = String(i.ID || '').trim().replace(/\./g, ''); // hapus titik jaga2
+    const idBayar = String(i.id || '').trim().replace(/\./g, ''); // hapus titik jaga2
     if (idBayar.startsWith(prefixID)) {
       const noKK = String(i.no_kk).trim();
       const nominal = Number(i.nominal) || 0;
