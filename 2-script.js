@@ -105,7 +105,7 @@ function loadData(){
   showSpinner();
   fetch(apiURL).then(res => res.json()).then(data => {
     rawData = data.warga || []; iuranData = data.iuran || [];
-    buildIuranMap(); renderTableWarga(); renderTableIuran();
+    buildIuranMap(); renderTableWarga(); renderTableIuran(); renderDaftarBayarBulanIni();
   }).catch(err => { console.log(err); alert("Gagal load data"); }).finally(() => hideSpinner());
 }
 
@@ -567,7 +567,20 @@ if (pakeWarna) {
       //   ...
       // }
 
-      XLSX.utils.book_append_sheet(wb, ws, "Rekap Iuran");
+        // TAMBAH DAFTAR BAYAR DI EXCEL
+  const dataBayar = renderDaftarBayarBulanIni();
+  ws_data.push([]);
+  ws_data.push([{v: `Yang Sudah Bayar ${dataBayar.bulan} ${dataBayar.tahun}:`, s: {font: {bold: true, sz: 12}}}]);
+  if (dataBayar.list.length) {
+    dataBayar.list.forEach(d => {
+      ws_data.push([{v: `${d.nama} - Rp ${d.total.toLocaleString('id-ID')} (Untuk: ${d.detail.join(', ')})`, t: 's'}]);
+    });
+  } else {
+    ws_data.push([{v: 'Belum ada yg bayar', t: 's'}]);
+  }
+
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Iuran 24 Bulan");
 
       let namaFile = tampilNominal
         ? `Rekap_Iuran_KETUA_${new Date().toISOString().slice(0,10)}.xlsx`
@@ -597,6 +610,51 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 
+function renderDaftarBayarBulanIni() {
+  const now = new Date();
+  const bulanArr = ["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];
+  const tahunIni = now.getFullYear();
+  const bulanIni = String(now.getMonth() + 1).padStart(2, '0');
+  const prefixID = `${tahunIni}.${bulanIni}`; // "2025.09"
+  const namaBulan = bulanArr[now.getMonth()];
+
+  let bayarPerKK = {};
+
+  iuranData.forEach(i => {
+    const idBayar = String(i.ID || '').trim();
+    if (idBayar.startsWith(prefixID)) {
+      const noKK = String(i.no_kk).trim();
+      const nominal = Number(i.nominal) || 0;
+
+      if (!bayarPerKK[noKK]) {
+        let kkData = rawData.find(w => String(w.no_kk).trim() === noKK);
+        let kepala = kkData?
+          (rawData.find(a => String(a.no_kk).trim() === noKK && String(a.status_keluarga||"").toLowerCase().includes("kepala")) || kkData)
+          : null;
+        let namaKK = kepala? `${kepala.blok} ${kepala.no_rumah} - ${kepala.nama}` : `KK ${noKK}`;
+        bayarPerKK[noKK] = { total: 0, nama: namaKK, detail: [] };
+      }
+
+      bayarPerKK[noKK].total += nominal;
+      bayarPerKK[noKK].detail.push(`${i.bulan} ${i.tahun}`);
+    }
+  });
+
+  let listKK = Object.values(bayarPerKK).sort((a,b) => a.nama.localeCompare(b.nama));
+
+  document.getElementById('judulBayarBulanIni').innerText = `Yang Sudah Bayar ${namaBulan} ${tahunIni}:`;
+  let html = listKK.length?
+    `<p><strong>${listKK.length} KK</strong></p>
+     <ul>${listKK.map(d =>
+       `<li>${d.nama} - <strong>Rp ${d.total.toLocaleString('id-ID')}</strong><br>
+        <span style="font-size:11px;color:#64748b;">Untuk: ${d.detail.join(', ')}</span></li>`
+     ).join('')}</ul>` :
+    `<p>Belum ada yg bayar</p>`;
+
+  document.getElementById('listBayarBulanIni').innerHTML = html;
+  return { bulan: namaBulan, tahun: tahunIni, list: listKK };
+}
+
 async function exportToPDF(){
   if(listBuktiTf.length === 0){
     const mauUpload = confirm('Bukti transfer belum ada. Mau upload dulu sebelum export PDF?');
@@ -620,7 +678,10 @@ async function exportToPDF(){
     ketDiv.style.marginTop = '15px';
     ketDiv.style.borderTop = '1px solid #ddd'; //  INI
     ketDiv.style.paddingTop = '10px'; //  INI
-    ketDiv.innerHTML = `
+    const dataBayar = renderDaftarBayarBulanIni();
+ketDiv.innerHTML = `
+  <div style="display: flex; gap: 30px; margin-top: 15px; border-top: 1px solid #ddd; padding-top: 10px;">
+    <div style="flex: 1;">
       <h3 style="font-size: 15px; margin-bottom: 5px;">Keterangan Iuran IPL:</h3>
       <p style="margin: 3px 0; font-size: 15px;">Sampah : Rp 15.000,-</p>
       <p style="margin: 3px 0; font-size: 15px;">Keamanan : Rp 30.000,-</p>
@@ -629,7 +690,19 @@ async function exportToPDF(){
       <p style="margin: 3px 0; font-size: 15px;">Pengajian : Rp 5.000,-</p>
       <p style="margin: 3px 0; font-size: 15px;">Total IPL : <strong>Rp 65.000,-</strong></p>
       <p style="margin: 3px 0; font-size: 15px;">Total IPL Nonis : <strong>Rp 60.000,-</strong></p>
-    `;
+    </div>
+    <div style="flex: 1;">
+      <h3 style="font-size: 15px; margin-bottom: 5px;">Yang Sudah Bayar ${dataBayar.bulan} ${dataBayar.tahun}:</h3>
+      ${dataBayar.list.length?
+        `<ul style="margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.5;">${dataBayar.list.map(d =>
+          `<li>${d.nama} - <strong>Rp ${d.total.toLocaleString('id-ID')}</strong><br>
+           <span style="font-size:11px;">Untuk: ${d.detail.join(', ')}</span></li>`
+        ).join('')}</ul>` :
+        `<p style="font-size: 14px;">Belum ada yg bayar</p>`
+      }
+    </div>
+  </div>
+`;
     element.appendChild(ketDiv);
     
     header.style.display = 'flex';
