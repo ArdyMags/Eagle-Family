@@ -599,19 +599,7 @@ tbody td{
   z-index:9998;
   box-shadow:0 4px 12px rgba(0,0,0,0.15);
 }
-.fab-menu{
-  display:flex;
-  gap:8px;
-  background:white;
-  border-radius:12px;
-  box-shadow:0 4px 12px rgba(0,0,0,0.15);
-  transform:translateX(130%);
-  transition:transform 0.3s ease,opacity 0.3s ease;
-  margin-right:10px;
-  opacity:0;
-  pointer-events:none;
-  padding:8px;
-}
+
 .fab-logo{
   cursor:pointer;
   transition:transform 0.5s ease;
@@ -692,4 +680,23 @@ tbody td{
 
 .dark-mode .dpdown-item:not(:last-child) {
   border-bottom: 1px solid #374151;
+}
+/* =========================
+   OVERRIDE FAB-MENU LAMA
+========================= */
+.fab-menu.dpdown-menu {
+  transform: none !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  display: none;
+  gap: 0;
+  padding: 0;
+  margin-right: 0;
+  background: transparent;
+  box-shadow: none;
+  border-radius: 0;
+}
+
+.fab-menu.dpdown-menu.show {
+  display: flex;
 }
