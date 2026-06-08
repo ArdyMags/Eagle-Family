@@ -492,7 +492,6 @@ function prosesExportExcel(){
 
       // 2. Ambil tabel
       const table = document.getElementById("tableIuran");
-      const wb = XLSX.utils.book_new();
       const ws_data = [];
 
       // 3. Header - SAMA PERSIS, GA ADA TAMBAHAN
