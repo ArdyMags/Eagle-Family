@@ -612,11 +612,6 @@ tbody td{
   pointer-events:none;
   padding:8px;
 }
-.fab-container.open .fab-menu{
-  transform:translateX(0);
-  opacity:1;
-  pointer-events:auto;
-}
 .fab-logo{
   cursor:pointer;
   transition:transform 0.5s ease;
