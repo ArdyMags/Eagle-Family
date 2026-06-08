@@ -556,16 +556,6 @@ if (pakeWarna) {
   ws_data.push([{v: 'Total IPL : Rp 65,000.-', t: 's', s: {font: {sz: 11}}, r: [{t: 'Total IPL : ', s: {font: {sz: 11}}}, {t: '65,000.-', s: {font: {sz: 11, bold: true}}}]}]);
   ws_data.push([{v: 'Total IPL Nonis : Rp 60,000.-', t: 's', s: {font: {sz: 11}}, r: [{t: 'Total IPL Nonis : ', s: {font: {sz: 11}}}, {t: '60,000.-', s: {font: {sz: 11, bold: true}}}]}]);
 }
-
-      const ws = XLSX.utils.aoa_to_sheet(ws_data);
-      ws['!cols'] = headerRow.map(() => ({wch: 18}));
-
-      // HAPUS BAGIAN INI - GA ADA JUDUL AN LAGI
-      // if (!tampilNominal) {
-      //   XLSX.utils.sheet_add_aoa(ws, [["REKAP IURAN WARGA - NOMINAL DISENSOR"]], { origin: "A1" });
-      //   ...
-      // }
-
         // TAMBAH DAFTAR BAYAR DI EXCEL
   const dataBayar = renderDaftarBayarBulanIni();
   ws_data.push([]);
