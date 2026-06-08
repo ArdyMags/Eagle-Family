@@ -579,14 +579,18 @@ if (pakeWarna) {
     ws_data.push([{v: 'Belum ada yg bayar', t: 's'}]);
   }
 
-  const wb = XLSX.utils.book_new();
+
+  const ws = XLSX.utils.aoa_to_sheet(ws_data); // INI DULU
+  ws['!cols'] = headerRow.map(() => ({wch: 18}));
+
+  const wb = XLSX.utils.book_new(); // CUMA 1X DI SINI
   XLSX.utils.book_append_sheet(wb, ws, "Iuran 24 Bulan");
 
-      let namaFile = tampilNominal
-        ? `Rekap_Iuran_KETUA_${new Date().toISOString().slice(0,10)}.xlsx`
-        : `Rekap_Iuran_WARGA_${new Date().toISOString().slice(0,10)}.xlsx`;
+  let namaFile = tampilNominal
+    ? `Rekap_Iuran_KETUA_${new Date().toISOString().slice(0,10)}.xlsx`
+    : `Rekap_Iuran_WARGA_${new Date().toISOString().slice(0,10)}.xlsx`;
 
-      XLSX.writeFile(wb, namaFile);
+  XLSX.writeFile(wb, namaFile);
       closeExcelModal();
 
     } catch(err) {
