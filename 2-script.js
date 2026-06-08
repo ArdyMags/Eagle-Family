@@ -425,12 +425,6 @@ function prosesLogin() {
   }
 }
 
-// Pas load, cek localStorage
-function cekAkses() {
-  USER_ACCESS = localStorage.getItem('role') || 'viewer';
-  return USER_ACCESS === 'admin';
-}
-
 function backupJSON(){
   if (!cekAkses()) return alert('Akses ditolak!');
      let data = { warga: rawData, iuran: iuranData };
@@ -726,7 +720,7 @@ function generateIuranID() {
   const mm = String(now.getMinutes()).padStart(2, '0');
   const ss = String(now.getSeconds()).padStart(2, '0');
   const ms = String(Math.floor(Math.random() * 1000)).padStart(3, '0');
-  return `${yyyy}${MM}${dd}${HH}${mm}${ss}${ms}`;
+  return `${yyyy}.${MM}${dd}.${HH}${mm}.${ss}${MS}`;
 }
 
 function loadBulanBayar(){
@@ -817,13 +811,14 @@ function simpanBayar(){
 }
 
 function toggleMenu() {
-  document.querySelector('.fab-container').classList.toggle('open');
+  document.getElementById('dpMenuAdmin').classList.toggle('show');
 }
 
 document.addEventListener('click', function(e) {
-  const fab = document.querySelector('.fab-container');
-  if (!fab.contains(e.target) && fab.classList.contains('open')) {
-    fab.classList.remove('open');
+  const wrapper = document.querySelector('.fab-container');
+  const menu = document.getElementById('dpMenuAdmin');
+  if (wrapper && !wrapper.contains(e.target) && menu.classList.contains('show')) {
+    menu.classList.remove('show');
   }
 });
 
@@ -849,7 +844,7 @@ function closeTambahModal(){
 
 function simpanTambah(){
   let data = [{
-    id: Date.now().toString(), // TAMBAH INI
+    id: generateIuranID(), // PAKE INI
     no_kk: document.getElementById('t_no_kk').value,
     nik: document.getElementById('t_nik').value,
     nama: document.getElementById('t_nama').value,
@@ -943,5 +938,10 @@ window.onload = () => {
   enableResize("tableWarga");
   enableResize("tableIuran");
 };
-
+// Close menu pas item diklik
+document.querySelectorAll('#dpMenuAdmin .dpdown-item').forEach(item => {
+  item.addEventListener('click', () => {
+    document.getElementById('dpMenuAdmin').classList.remove('show');
+  });
+});
 loadData();
