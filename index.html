@@ -16,12 +16,12 @@
 
 <div class="fab-container">
   <div id="jam-wib"></div>
-  <div class="fab-menu">
-    <button id="btnBackup" class="admin-only" onclick="backupJSON()">Backup</button>
-    <button id="btnTambah" class="admin-only" onclick="openTambahModal()">Tambah Data</button>
-    <button id="btnBayar" class="admin-only" onclick="openBayarModal()">Bayar</button>
-    <button id="btnExportExcel" class="admin-only" onclick="openExcelModal()">Export Excel</button>
-    <button id="btnExportPDF" class="admin-only" onclick="exportToPDF()">Export PDF</button>
+    <div class="fab-menu dpdown-menu dpdown-menu-end" id="dpMenuAdmin">
+    <button id="btnBackup" class="dpdown-item admin-only" onclick="runAsAdmin(backupJSON)">Backup Data</button>
+    <button id="btnTambah" class="dpdown-item admin-only" onclick="runAsAdmin(openTambahModal)">Tambah Data</button>
+    <button id="btnBayar" class="dpdown-item admin-only" onclick="runAsAdmin(openBayarModal)">Bayar Iuran</button>
+    <button id="btnExportExcel" class="dpdown-item admin-only" onclick="runAsAdmin(openExcelModal)">Export Excel</button>
+    <button id="btnExportPDF" class="dpdown-item admin-only" onclick="runAsAdmin(exportToPDF)">Export PDF</button>
   </div>
   <input type="file" id="inputBuktiTf" accept="image/*" style="display:none" onchange="previewBuktiTf(event)">
   <div class="fab-logo" onclick="toggleMenu()"><img src="Elang1.png" alt="Logo"></div>
