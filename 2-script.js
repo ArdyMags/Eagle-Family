@@ -618,17 +618,17 @@ function renderDaftarBayarBulanIni() {
       const noKK = String(i.no_kk).trim();
       const nominal = Number(i.nominal) || 0;
 
-      if (!bayarPerKK) { // TAMBAH 
+      if (!bayarPerKK[noKK]) { // TAMBAH 
         let kkData = rawData.find(w => String(w.no_kk).trim() === noKK);
         let kepala = kkData?
           (rawData.find(a => String(a.no_kk).trim() === noKK && String(a.status_keluarga||"").toLowerCase().includes("kepala")) || kkData)
           : null;
         let namaKK = kepala? `${kepala.blok} ${kepala.no_rumah} - ${kepala.nama}` : `KK ${noKK}`;
-        bayarPerKK = { total: 0, nama: namaKK, detail: [] }; // TAMBAH 
+        bayarPerKK[noKK] = { total: 0, nama: namaKK, detail: [] }; // TAMBAH 
       }
 
-      bayarPerKK.total += nominal; // TAMBAH 
-      bayarPerKK.detail.push(`${i.bulan} ${i.tahun}`); // TAMBAH 
+      bayarPerKK[noKK].total += nominal; // TAMBAH 
+      bayarPerKK[noKK].detail.push(`${i.bulan} ${i.tahun}`); // TAMBAH 
     }
   });
 
