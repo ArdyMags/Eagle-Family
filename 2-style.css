@@ -630,3 +630,71 @@ tbody td{
 .fab-container.open .fab-logo{
   transform:rotateY(180deg);
 }
+/* =========================
+   DROPDOWN MENU ADMIN
+========================= */
+.dpdown-menu {
+  display: none;
+  position: absolute;
+  top: 70px;
+  right: 10px;
+  background: white;
+  min-width: 240px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  z-index: 10001;
+  overflow: hidden;
+  flex-direction: column;
+}
+
+.dpdown-menu.show {
+  display: flex;
+}
+
+.dpdown-menu-end {
+  right: 10px;
+}
+
+.dpdown-item {
+  width: 100%;
+  padding: 14px 18px;
+  border: none;
+  background: white;
+  text-align: left;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.2s ease;
+}
+
+.dpdown-item:hover {
+  background: #f3f4f6;
+  padding-left: 22px;
+}
+
+.dpdown-item:not(:last-child) {
+  border-bottom: 1px solid #e5e7eb;
+}
+
+/* Dark mode */
+.dark-mode .dpdown-menu {
+  background: #1f2937;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+}
+
+.dark-mode .dpdown-item {
+  background: #1f2937;
+  color: #e5e7eb;
+}
+
+.dark-mode .dpdown-item:hover {
+  background: #374151;
+}
+
+.dark-mode .dpdown-item:not(:last-child) {
+  border-bottom: 1px solid #374151;
+}
