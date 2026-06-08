@@ -363,6 +363,7 @@ function toggleDetail(kk){
 }
 
 function openBayarModal(){
+  document.getElementById('dpMenuAdmin').classList.remove('show'); // TAMBAH INI
   if (!cekAkses()) {
        // Kalo bukan admin, tanya mau login ga
        if (confirm('Akses ditolak. Login sebagai admin?')) {
@@ -426,6 +427,7 @@ function prosesLogin() {
 }
 
 function backupJSON(){
+  document.getElementById('dpMenuAdmin').classList.remove('show'); // TAMBAH INI
   if (!cekAkses()) return alert('Akses ditolak!');
      let data = { warga: rawData, iuran: iuranData };
   let blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
@@ -436,6 +438,7 @@ function backupJSON(){
 }
 
 function openExcelModal(){
+  document.getElementById('dpMenuAdmin').classList.remove('show'); // TAMBAH INI
   if (!cekAkses()) {
     if (confirm('Akses ditolak. Login sebagai admin?')) openLoginModal();
     return;
@@ -610,6 +613,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 async function exportToPDF(){
+  document.getElementById('dpMenuAdmin').classList.remove('show'); // TAMBAH INI
   if(listBuktiTf.length === 0){
     const mauUpload = confirm('Bukti transfer belum ada. Mau upload dulu sebelum export PDF?');
     if(mauUpload){
@@ -823,6 +827,7 @@ document.addEventListener('click', function(e) {
 });
 
 function openTambahModal(){
+  document.getElementById('dpMenuAdmin').classList.remove('show'); // TAMBAH INI
   if (!cekAkses()) {
     if (confirm('Akses ditolak. Login sebagai admin?')) {
       openLoginModal();
@@ -938,10 +943,12 @@ window.onload = () => {
   enableResize("tableWarga");
   enableResize("tableIuran");
 };
-// Close menu pas item diklik
+// Close menu pas item diklik - kasih delay
 document.querySelectorAll('#dpMenuAdmin .dpdown-item').forEach(item => {
   item.addEventListener('click', () => {
-    document.getElementById('dpMenuAdmin').classList.remove('show');
+    setTimeout(() => {
+      document.getElementById('dpMenuAdmin').classList.remove('show');
+    }, 100);
   });
 });
 loadData();
