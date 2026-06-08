@@ -772,7 +772,7 @@ function generateIuranID() {
   const HH = String(now.getHours()).padStart(2, '0');
   const ss = String(now.getSeconds()).padStart(2, '0');
   const ms = String(Math.floor(Math.random() * 1000)).padStart(3, '0');
-  return `${yyyy}${MM}${dd}${HH}${ms}`;
+  return `${yyyy}${MM}${dd}${HH}${ss}${ms}`;
 }
 
 function loadBulanBayar(){
