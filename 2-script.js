@@ -363,14 +363,6 @@ function toggleDetail(kk){
 }
 
 function openBayarModal(){
-  document.getElementById('dpMenuAdmin').classList.remove('show'); // TAMBAH INI
-  if (!cekAkses()) {
-       // Kalo bukan admin, tanya mau login ga
-       if (confirm('Akses ditolak. Login sebagai admin?')) {
-         openLoginModal(); // Buka popup login
-       }
-       return; // Stop, jangan buka modal bayar
-     }
   document.getElementById('bayarModal').style.display = 'flex';
   let grouped = groupByKK(rawData);
   let selectKK = document.getElementById('selectKK');
@@ -427,9 +419,7 @@ function prosesLogin() {
 }
 
 function backupJSON(){
-  document.getElementById('dpMenuAdmin').classList.remove('show'); // TAMBAH INI
-  if (!cekAkses()) return alert('Akses ditolak!');
-     let data = { warga: rawData, iuran: iuranData };
+  let data = { warga: rawData, iuran: iuranData };
   let blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
   let a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
@@ -438,11 +428,6 @@ function backupJSON(){
 }
 
 function openExcelModal(){
-  document.getElementById('dpMenuAdmin').classList.remove('show'); // TAMBAH INI
-  if (!cekAkses()) {
-    if (confirm('Akses ditolak. Login sebagai admin?')) openLoginModal();
-    return;
-  }
   document.getElementById('excelModal').style.display = 'flex';
 
   // Generate checkbox bulan
@@ -613,7 +598,6 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 async function exportToPDF(){
-  document.getElementById('dpMenuAdmin').classList.remove('show'); // TAMBAH INI
   if(listBuktiTf.length === 0){
     const mauUpload = confirm('Bukti transfer belum ada. Mau upload dulu sebelum export PDF?');
     if(mauUpload){
@@ -814,6 +798,15 @@ function simpanBayar(){
   }).catch(err=>{ alert('Error: '+err.message); }).finally(()=>{ hideSpinner(); });
 }
 
+function runAsAdmin(fn) {
+  document.getElementById('dpMenuAdmin').classList.remove('show');
+  if (!cekAkses()) {
+    if (confirm('Akses ditolak. Login sebagai admin?')) openLoginModal();
+    return;
+  }
+  fn(); // Jalanin function yg dikirim: backupJSON, openTambahModal, dll
+}
+
 function toggleMenu() {
   document.getElementById('dpMenuAdmin').classList.toggle('show');
 }
@@ -827,14 +820,7 @@ document.addEventListener('click', function(e) {
 });
 
 function openTambahModal(){
-  document.getElementById('dpMenuAdmin').classList.remove('show'); // TAMBAH INI
-  if (!cekAkses()) {
-    if (confirm('Akses ditolak. Login sebagai admin?')) {
-      openLoginModal();
-    }
-    return;
-  }
-     document.getElementById('tambahModal').style.display = 'flex';
+  document.getElementById('tambahModal').style.display = 'flex';
   document.getElementById('t_jk').innerHTML = buatOption(MASTER.jenisKelamin);
   document.getElementById('t_agama').innerHTML = buatOption(MASTER.agama);
   document.getElementById('t_status').innerHTML = buatOption(MASTER.statusKeluarga);
@@ -943,12 +929,5 @@ window.onload = () => {
   enableResize("tableWarga");
   enableResize("tableIuran");
 };
-// Close menu pas item diklik - kasih delay
-document.querySelectorAll('#dpMenuAdmin .dpdown-item').forEach(item => {
-  item.addEventListener('click', () => {
-    setTimeout(() => {
-      document.getElementById('dpMenuAdmin').classList.remove('show');
-    }, 100);
-  });
-});
+
 loadData();
