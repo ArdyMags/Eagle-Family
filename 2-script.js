@@ -783,7 +783,7 @@ function generateIuranID() {
   const HH = String(now.getHours()).padStart(2, '0');
   const mm = String(now.getMinutes()).padStart(2, '0');
   const ss = String(now.getSeconds()).padStart(2, '0');
-  const ms = String(Math.floor(Math.random() * 1000)).padStart(3, '0');
+  const MS = String(Math.floor(Math.random() * 1000)).padStart(3, '0');
   return `${yyyy}.${MM}${dd}.${HH}${mm}.${ss}${MS}`;
 }
 
