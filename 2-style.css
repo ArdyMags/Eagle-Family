@@ -776,7 +776,3 @@ tbody td{
 .dark-mode #listBayarBulanIni {
   color: #cbd5e1;
 }
-
-@media print {
-.info-bawah-tabel { display: none; }
-}
