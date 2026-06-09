@@ -105,7 +105,7 @@ function loadData(){
   showSpinner();
   fetch(apiURL).then(res => res.json()).then(data => {
     rawData = data.warga || []; iuranData = data.iuran || [];
-    buildIuranMap(); renderTableWarga(); renderTableIuran(); renderDaftarBayarBulanIni();
+    buildIuranMap(); renderTableWarga(); renderTableIuran(); renderDaftarBayarBulanIni(); updatePeriodeJudul();
   }).catch(err => { console.log(err); alert("Gagal load data"); }).finally(() => hideSpinner());
 }
 
@@ -651,7 +651,14 @@ function renderDaftarBayarBulanIni() {
   document.getElementById('listBayarBulanIni').innerHTML = html;
   return { bulan: namaBulan, tahun: tahunIni, list: listKK };
 }
-
+function updatePeriodeJudul(){
+  const bulanArr = ["JANUARI","FEBRUARI","MARET","APRIL","MEI","JUNI","JULI","AGUSTUS","SEPTEMBER","OKTOBER","NOVEMBER","DESEMBER"];
+  const now = new Date();
+  const bulan = bulanArr[now.getMonth()];
+  const tahun = now.getFullYear();
+  const el = document.getElementById('periodeJudul');
+  if(el) el.innerText = `PERIODE ${bulan} ${tahun}`;
+}
 async function exportToPDF(){
   if(listBuktiTf.length === 0){
     const mauUpload = confirm('Bukti transfer belum ada. Mau upload dulu sebelum export PDF?');
