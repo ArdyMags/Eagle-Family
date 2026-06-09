@@ -611,13 +611,16 @@ function renderDaftarBayarBulanIni() {
   const namaBulan = bulanArr[now.getMonth()];
 
   let bayarPerKK = {};
-
+  let totalSemua = 0;
+  
   iuranData.forEach(i => {
     const idBayar = String(i.id || '').trim().replace(/\./g, ''); // hapus titik jaga2
     if (idBayar.startsWith(prefixID)) {
       const noKK = String(i.no_kk).trim();
       const nominal = Number(i.nominal) || 0;
 
+      totalSemua += nominal;
+      
       if (!bayarPerKK[noKK]) { // TAMBAH 
         let kkData = rawData.find(w => String(w.no_kk).trim() === noKK);
         let kepala = kkData?
@@ -636,10 +639,10 @@ function renderDaftarBayarBulanIni() {
 
   document.getElementById('judulBayarBulanIni').innerText = `Yang Sudah Bayar ${namaBulan} ${tahunIni}:`;
   let html = listKK.length?
-    `<p><strong>${listKK.length} KK</strong></p>
+    `<p><strong>${listKK.length} KK | Total: Rp ${totalSemua.toLocaleString('id-ID')}</strong></p>
      <ul>${listKK.map(d =>
        `<li>${d.nama} - <strong>Rp ${d.total.toLocaleString('id-ID')}</strong><br>
-        <span style="font-size:11px;color:#64748b;">Untuk: ${d.detail.join(', ')}</span></li>`
+        <span style="font-size:14px;color:#64748b;">Untuk: ${d.detail.join(', ')}</span></li>`
      ).join('')}</ul>` :
     `<p>Belum ada yg bayar</p>`;
 
