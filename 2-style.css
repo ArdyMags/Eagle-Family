@@ -787,11 +787,5 @@ tbody td{
 }
 
 @media print {
- .total-bayar-summary {
-    color: #000!important;
-    font-size: 16px!important;
-  }
- .detail-bayar {
-    color: #000!important;
-  }
+  .ket-ipl-box { display: none !important; }
 }
