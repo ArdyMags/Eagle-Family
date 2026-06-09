@@ -637,18 +637,22 @@ function renderDaftarBayarBulanIni() {
 
   let listKK = Object.values(bayarPerKK).sort((a,b) => a.nama.localeCompare(b.nama));
 
-  document.getElementById('judulBayarBulanIni').innerText = `Yang Sudah Bayar ${namaBulan} ${tahunIni}:`;
-  let html = listKK.length?
-    `<div class="total-bayar-summary">
-       <strong>${listKK.length} KK | Total: Rp ${totalSemua.toLocaleString('id-ID')}</strong>
-     </div>
-     <ul>${listKK.map(d =>
-       `<li>${d.nama} - <strong>Rp ${d.total.toLocaleString('id-ID')}</strong><br>
-        <span class="detail-bayar">Untuk: ${d.detail.join(', ')}</span></li>`
-     ).join('')}</ul>` :
-    `<p>Belum ada yg bayar</p>`;
-
-  document.getElementById('listBayarBulanIni').innerHTML = html;
+  // GUARD: kalo element ga ada, skip aja. Ga usah set innerText
+  const judulEl = document.getElementById('judulBayarBulanIni');
+  const listEl = document.getElementById('listBayarBulanIni');
+  if (judulEl && listEl) {
+    judulEl.innerText = `Yang Sudah Bayar ${namaBulan} ${tahunIni}:`;
+    let html = listKK.length?
+      `<div class="total-bayar-summary">
+         <strong>${listKK.length} KK | Total: Rp ${totalSemua.toLocaleString('id-ID')}</strong>
+       </div>
+       <ul>${listKK.map(d =>
+         `<li>${d.nama} - <strong>Rp ${d.total.toLocaleString('id-ID')}</strong><br>
+          <span class="detail-bayar">Untuk: ${d.detail.join(', ')}</span></li>`
+       ).join('')}</ul>` :
+      `<p>Belum ada yg bayar</p>`;
+    listEl.innerHTML = html;
+  }
   return { bulan: namaBulan, tahun: tahunIni, list: listKK };
 }
 function updatePeriodeJudul(){
