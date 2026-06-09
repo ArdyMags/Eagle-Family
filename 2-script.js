@@ -105,7 +105,7 @@ function loadData(){
   showSpinner();
   fetch(apiURL).then(res => res.json()).then(data => {
     rawData = data.warga || []; iuranData = data.iuran || [];
-    buildIuranMap(); renderTableWarga(); renderTableIuran(); renderDaftarBayarBulanIni(); updatePeriodeJudul();
+    buildIuranMap(); renderTableWarga(); renderTableIuran(); renderDaftarBayarBulanIni();
   }).catch(err => { console.log(err); alert("Gagal load data"); }).finally(() => hideSpinner());
 }
 
@@ -636,23 +636,18 @@ function renderDaftarBayarBulanIni() {
   });
 
   let listKK = Object.values(bayarPerKK).sort((a,b) => a.nama.localeCompare(b.nama));
-
-  // GUARD: kalo element ga ada, skip aja. Ga usah set innerText
-  const judulEl = document.getElementById('judulBayarBulanIni');
-  const listEl = document.getElementById('listBayarBulanIni');
-  if (judulEl && listEl) {
-    judulEl.innerText = `Yang Sudah Bayar ${namaBulan} ${tahunIni}:`;
-    let html = listKK.length?
-      `<div class="total-bayar-summary">
-         <strong>${listKK.length} KK | Total: Rp ${totalSemua.toLocaleString('id-ID')}</strong>
+document.getElementById('judulBayarBulanIni').innerText = Yang Sudah Bayar ${namaBulan} ${tahunIni}:;
+  let html = listKK.length?
+    `<div style="margin-bottom:10px">
+       <strong style="font-size:16px">${listKK.length} KK | Total: Rp ${totalSemua.toLocaleString('id-ID')}</strong>
        </div>
-       <ul>${listKK.map(d =>
-         `<li>${d.nama} - <strong>Rp ${d.total.toLocaleString('id-ID')}</strong><br>
-          <span class="detail-bayar">Untuk: ${d.detail.join(', ')}</span></li>`
-       ).join('')}</ul>` :
-      `<p>Belum ada yg bayar</p>`;
-    listEl.innerHTML = html;
-  }
+     <ul>${listKK.map(d =>
+       `<li>${d.nama} - <strong>Rp ${d.total.toLocaleString('id-ID')}</strong><br>
+        <span style="font-size:14px;color:#64748b;">Untuk: ${d.detail.join(', ')}</span></li>`
+     ).join('')}</ul>` :
+    <p>Belum ada yg bayar</p>;
+
+  document.getElementById('listBayarBulanIni').innerHTML = html;
   return { bulan: namaBulan, tahun: tahunIni, list: listKK };
 }
 function updatePeriodeJudul(){
