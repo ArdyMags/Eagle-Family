@@ -787,5 +787,13 @@ tbody td{
 }
 
 @media print {
-  .ket-ipl-box { display: none !important; }
+  .info-bawah-tabel {
+    border-top: 2px solid #000 !important;
+    padding-top: 10px !important;
+    margin-top: 15px !important;
+  }
+  
+  .ket-ipl-box { 
+    display: block !important; /* Biar nongol lagi kalo sebelumnya lu hide */
+  }
 }
