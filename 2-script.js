@@ -1002,6 +1002,7 @@ function hapusBuktiTf(index){
 
 window.onload = () => {
    applyAkses();
+  updatePeriodeJudul();
   enableResize("tableWarga");
   enableResize("tableIuran");
 };
