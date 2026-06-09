@@ -708,7 +708,7 @@ tbody td{
 }
 
 .ket-ipl-box,.daftar-bayar-box {
-  flex: 1;
+  flex: none;
   min-width: 300px;
   padding: 15px 20px;
   background: #f8fafc;
@@ -746,7 +746,7 @@ tbody td{
 #listBayarBulanIni {
   font-size: 16px;
   color: #475569;
-  max-height: 200px;
+  max-height: none;
   overflow-y: auto;
 }
 
