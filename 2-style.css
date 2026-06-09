@@ -776,3 +776,13 @@ tbody td{
 .dark-mode #listBayarBulanIni {
   color: #cbd5e1;
 }
+@media print {
+  .info-bawah-tabel { display: block !important; }
+  .ket-ipl-box { display: none !important; }
+  .daftar-bayar-box {
+    display: block !important;
+    border: none !important;
+    box-shadow: none !important;
+    min-width: 100% !important;
+  }
+}
