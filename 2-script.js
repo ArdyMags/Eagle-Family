@@ -639,12 +639,12 @@ function renderDaftarBayarBulanIni() {
 
   document.getElementById('judulBayarBulanIni').innerText = `Yang Sudah Bayar ${namaBulan} ${tahunIni}:`;
   let html = listKK.length?
-    `<div style="margin-bottom:10px">
-       <strong style="font-size:16px">${listKK.length} KK | Total: Rp ${totalSemua.toLocaleString('id-ID')}</strong>
-       </div>
+    `<div class="total-bayar-summary">
+       <strong>${listKK.length} KK | Total: Rp ${totalSemua.toLocaleString('id-ID')}</strong>
+     </div>
      <ul>${listKK.map(d =>
        `<li>${d.nama} - <strong>Rp ${d.total.toLocaleString('id-ID')}</strong><br>
-        <span style="font-size:14px;color:#64748b;">Untuk: ${d.detail.join(', ')}</span></li>`
+        <span class="detail-bayar">Untuk: ${d.detail.join(', ')}</span></li>`
      ).join('')}</ul>` :
     `<p>Belum ada yg bayar</p>`;
 
