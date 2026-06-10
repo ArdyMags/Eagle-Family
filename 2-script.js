@@ -103,10 +103,26 @@ setInterval(updateJam, 1000);
 
 function loadData(){
   showSpinner();
-  fetch(apiURL).then(res => res.json()).then(data => {
-    rawData = data.warga || []; iuranData = data.iuran || [];
-    buildIuranMap(); renderTableWarga(); renderTableIuran(); renderDaftarBayarBulanIni();
-  }).catch(err => { console.log(err); alert("Gagal load data"); }).finally(() => hideSpinner());
+  fetch(apiURL)
+    .then(res => res.json())
+    .then(data => {
+      rawData = data.warga || [];
+      iuranData = data.iuran || [];
+      buildIuranMap();
+      renderTableWarga();
+      renderTableIuran();
+
+      try {
+        renderDaftarBayarBulanIni();
+      } catch (err) {
+        console.error('Render daftar bayar gagal:', err);
+      }
+    })
+    .catch(err => {
+      console.error('Fetch data gagal:', err);
+      alert("Gagal load data dari server");
+    })
+    .finally(() => hideSpinner());
 }
 
 function buildIuranMap(){
@@ -146,8 +162,8 @@ function renderTableWarga(){
         <td><select data-field="status_huni" disabled>${buatOption(MASTER.statusHuni, r.status_huni)}</select></td>
         <td><input data-field="alamat" value="${r.alamat || ''}" disabled></td>
         <td>
-          <button class="btn edit" onclick="toggleEditRow(this)">✏️</button>
-          <button class="btn delete" onclick="hapusRow(this)">🗑️</button>
+          <button class="btn edit admin-only" onclick="toggleEditRow(this)">✏️</button>
+          <button class="btn delete admin-only" onclick="hapusRow(this)">🗑️</button>
         </td>
       </tr>`;
     });
@@ -178,6 +194,7 @@ function renderTableIuran(sortedArr = null){
     let kk = item.kk, first = item.first, namaKK = item.nama;
     let tunggakan = 0;
     bulanList.forEach(b => {
+      if (!b.sudahLewat) return;
       let bayar = iuranData.find(i=> String(i.no_kk).trim()===String(kk).trim() && String(i.bulan).trim().toLowerCase()===b.bulan.toLowerCase() && String(i.tahun).trim()===String(b.tahun));
       if(!bayar) tunggakan++;
     });
@@ -227,9 +244,18 @@ function hitungTotalTunggakan(){
   document.getElementById('totalTunggakan').innerText = 'Rp ' + total.toLocaleString('id-ID');
 }
 
-function hapusRow(btn){ if(confirm("Hapus data ini?")) btn.parentElement.parentElement.remove(); }
+function hapusRow(btn){
+  if (!cekAkses()) {
+    openLoginModal();
+    return;
+  }
+ if(confirm("Hapus data ini?")) btn.parentElement.parentElement.remove(); }
 
 function toggleEditRow(btn){
+  if (!cekAkses()) {
+    openLoginModal();
+    return;
+  }
   let row = btn.closest('tr'), inputs = row.querySelectorAll('input, select'), isEditing = btn.classList.contains('edit');
   if(isEditing){
     inputs.forEach(el => el.disabled = false);
@@ -355,7 +381,7 @@ function enableResize(tableId){
 
 function toggleDetail(kk){
   let rows = document.querySelectorAll(`.detail-${kk}`);
-  let btn = document.querySelector(`.kk-row[data-kk="${kk}"].toggle-btn`);
+  let btn = document.querySelector(`.kk-row[data-kk="${kk}"] .toggle-btn`);
   if(!rows.length) return;
   let isHidden = rows[0].style.display === "none";
   rows.forEach(r => r.style.display = isHidden? "table-row" : "none");
@@ -607,49 +633,82 @@ function renderDaftarBayarBulanIni() {
   const bulanArr = ["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];
   const tahunIni = now.getFullYear();
   const bulanIni = String(now.getMonth() + 1).padStart(2, '0');
-  const prefixID = `${tahunIni}${bulanIni}`; // "202509"
+  const prefixID = `${tahunIni}${bulanIni}`;
   const namaBulan = bulanArr[now.getMonth()];
 
   let bayarPerKK = {};
   let totalSemua = 0;
   
   iuranData.forEach(i => {
-    const idBayar = String(i.id || '').trim().replace(/\./g, ''); // hapus titik jaga2
+    const idBayar = String(i.id || '').trim().replace(/\./g, '');
     if (idBayar.startsWith(prefixID)) {
       const noKK = String(i.no_kk).trim();
       const nominal = Number(i.nominal) || 0;
 
       totalSemua += nominal;
       
-      if (!bayarPerKK[noKK]) { // TAMBAH 
+      if (!bayarPerKK[noKK]) {
         let kkData = rawData.find(w => String(w.no_kk).trim() === noKK);
-        let kepala = kkData?
-          (rawData.find(a => String(a.no_kk).trim() === noKK && String(a.status_keluarga||"").toLowerCase().includes("kepala")) || kkData)
+        let kepala = kkData
+          ? (rawData.find(a => String(a.no_kk).trim() === noKK && String(a.status_keluarga || "").toLowerCase().includes("kepala")) || kkData)
           : null;
-        let namaKK = kepala? `${kepala.blok} ${kepala.no_rumah} - ${kepala.nama}` : `KK ${noKK}`;
-        bayarPerKK[noKK] = { total: 0, nama: namaKK, detail: [] }; // TAMBAH 
+        let namaKK = kepala ? `${kepala.blok} ${kepala.no_rumah} - ${kepala.nama}` : `KK ${noKK}`;
+        bayarPerKK[noKK] = { total: 0, nama: namaKK, detail: [] };
       }
 
-      bayarPerKK[noKK].total += nominal; // TAMBAH 
-      bayarPerKK[noKK].detail.push(`${i.bulan} ${i.tahun}`); // TAMBAH 
+      bayarPerKK[noKK].total += nominal;
+      bayarPerKK[noKK].detail.push(`${i.bulan} ${i.tahun}`);
     }
   });
 
   let listKK = Object.values(bayarPerKK).sort((a,b) => a.nama.localeCompare(b.nama));
 
-  document.getElementById('judulBayarBulanIni').innerText = `Yang Sudah Bayar ${namaBulan} ${tahunIni}:`;
-  let html = listKK.length?
-    `<div class="total-bayar-summary">
-       <strong>${listKK.length} KK | Total: Rp ${totalSemua.toLocaleString('id-ID')}</strong>
-     </div>
-     <ul>${listKK.map(d =>
-       `<li>${d.nama} - <strong>Rp ${d.total.toLocaleString('id-ID')}</strong><br>
-        <span class="detail-bayar">Untuk: ${d.detail.join(', ')}</span></li>`
-     ).join('')}</ul>` :
-    `<p>Belum ada yg bayar</p>`;
+  const judulEl = document.getElementById('judulBayarBulanIni');
+  const listEl = document.getElementById('listBayarBulanIni');
 
-  document.getElementById('listBayarBulanIni').innerHTML = html;
+  const html = listKK.length
+    ? `<div class="total-bayar-summary">
+         <strong>${listKK.length} KK | Total: Rp ${totalSemua.toLocaleString('id-ID')}</strong>
+       </div>
+       <ul>${listKK.map(d =>
+         `<li>${d.nama} - <strong>Rp ${d.total.toLocaleString('id-ID')}</strong><br>
+          <span class="detail-bayar">Untuk: ${d.detail.join(', ')}</span></li>`
+       ).join('')}</ul>`
+    : `<p>Belum ada yg bayar</p>`;
+
+  if (judulEl) {
+    judulEl.innerText = `Yang Sudah Bayar ${namaBulan} ${tahunIni}:`;
+  }
+
+  if (listEl) {
+    listEl.innerHTML = html;
+  }
+
   return { bulan: namaBulan, tahun: tahunIni, list: listKK };
+}
+
+function getNamaBulanIndo(indexBulan){
+  const bulanArr = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
+  return bulanArr[indexBulan];
+}
+
+
+function getLabelPeriodeHeader() {
+  const now = new Date();
+  return `Periode ${getNamaBulanIndo(now.getMonth())} ${now.getFullYear()}`;
+  // kalau mau format lain:
+  // return `Update ${getNamaBulanIndo(now.getMonth())} ${now.getFullYear()}`;
+}
+
+
+function updatePeriodeLabel() {
+  const el = document.getElementById('periodeLabel');
+  if (el) {
+    el.innerText = getLabelPeriodeHeader();
+    console.log('Periode header updated:', el.innerText);
+  } else {
+    console.warn('Elemen #periodeLabel tidak ditemukan');
+  }
 }
 
 async function exportToPDF(){
@@ -669,39 +728,6 @@ async function exportToPDF(){
     const oldDisplay = header.style.display;
     const oldDisplayBukti = buktiTfDiv.style.display;
 
-    // INJECT KETERANGAN IPL SEMENTARA
-    const ketDiv = document.createElement('div');
-    ketDiv.id = 'tempKetIPL';
-    ketDiv.style.marginTop = '15px';
-    ketDiv.style.borderTop = '1px solid #ddd'; //  INI
-    ketDiv.style.paddingTop = '10px'; //  INI
-    const dataBayar = renderDaftarBayarBulanIni();
-ketDiv.innerHTML = `
-  <div style="display: flex; gap: 30px; margin-top: 15px; border-top: 1px solid #ddd; padding-top: 10px;">
-    <div style="flex: 1;">
-      <h3 style="font-size: 15px; margin-bottom: 5px;">Keterangan Iuran IPL:</h3>
-      <p style="margin: 3px 0; font-size: 15px;">Sampah : Rp 15.000,-</p>
-      <p style="margin: 3px 0; font-size: 15px;">Keamanan : Rp 30.000,-</p>
-      <p style="margin: 3px 0; font-size: 15px;">Kas : Rp 10.000,-</p>
-      <p style="margin: 3px 0; font-size: 15px;">Dana Sosial : Rp 5.000,-</p>
-      <p style="margin: 3px 0; font-size: 15px;">Pengajian : Rp 5.000,-</p>
-      <p style="margin: 3px 0; font-size: 15px;">Total IPL : <strong>Rp 65.000,-</strong></p>
-      <p style="margin: 3px 0; font-size: 15px;">Total IPL Nonis : <strong>Rp 60.000,-</strong></p>
-    </div>
-    <div style="flex: 1;">
-      <h3 style="font-size: 15px; margin-bottom: 5px;">Yang Sudah Bayar ${dataBayar.bulan} ${dataBayar.tahun}:</h3>
-      ${dataBayar.list.length?
-        `<ul style="margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.5;">${dataBayar.list.map(d =>
-          `<li>${d.nama} - <strong>Rp ${d.total.toLocaleString('id-ID')}</strong><br>
-           <span style="font-size:11px;">Untuk: ${d.detail.join(', ')}</span></li>`
-        ).join('')}</ul>` :
-        `<p style="font-size: 14px;">Belum ada yg bayar</p>`
-      }
-    </div>
-  </div>
-`;
-    element.appendChild(ketDiv);
-    
     header.style.display = 'flex';
     if(listBuktiTf.length === 0) buktiTfDiv.style.display = 'none';
     
@@ -732,7 +758,6 @@ ketDiv.innerHTML = `
       }
     });
       
-    element.removeChild(ketDiv);
     header.style.display = oldDisplay;
     buktiTfDiv.style.display = oldDisplayBukti;
   
@@ -994,9 +1019,10 @@ function hapusBuktiTf(index){
 }
 
 window.onload = () => {
-   applyAkses();
+  applyAkses();
   enableResize("tableWarga");
   enableResize("tableIuran");
+  updatePeriodeLabel();
 };
 
 loadData();
