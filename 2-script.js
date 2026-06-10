@@ -734,7 +734,7 @@ async function exportToPDF(){
     await new Promise(resolve => setTimeout(resolve, 100));
     
     const canvas = await html2canvas(element, { 
-      scale: 2,
+      scale: 1.2,
       useCORS: true, 
       backgroundColor: '#ffffff',
       onclone: (clonedDoc, clonedElement) => {
@@ -761,7 +761,7 @@ async function exportToPDF(){
     header.style.display = oldDisplay;
     buktiTfDiv.style.display = oldDisplayBukti;
   
-    const imgData = canvas.toDataURL('image/png');
+    const imgData = canvas.toDataURL('image/jpeg', 0.75);
     const { jsPDF } = window.jspdf;
     const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
     const pdfWidth = pdf.internal.pageSize.getWidth();
@@ -773,7 +773,7 @@ async function exportToPDF(){
     let heightLeft = imgHeight;
     let position = margin;
   
-    pdf.addImage(imgData, 'PNG', margin, position, imgWidth, imgHeight);
+    pdf.addImage(imgData, 'JPEG', margin, position, imgWidth, imgHeight);
     heightLeft -= (pdfHeight - margin * 2);
 
     while (heightLeft > 0) {
