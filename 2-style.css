@@ -233,7 +233,7 @@ body.dark-mode {
 }
 body:not(.dark-mode) {
   --bg-tunggakan: var(--bg-tunggakan-light);
-  --text-tunggakan: var(--text-tunggakan-dark);
+  --text-tunggakan: var(--text-tunggakan-light);
 }
 .row-tunggakan {
   background: var(--bg-tunggakan) !important;
@@ -760,15 +760,15 @@ tbody td{
   line-height: 1.4;
 }
 
-.dark-mode.ket-ipl-box,
-.dark-mode.daftar-bayar-box {
+.dark-mode .ket-ipl-box,
+.dark-mode .daftar-bayar-box {
   background: #1e2937;
   border-color: #374151;
 }
 
-.dark-mode.ket-ipl-box h3,
-.dark-mode.daftar-bayar-box h3,
-.dark-mode.ket-grid.total {
+.dark-mode .ket-ipl-box h3,
+.dark-mode .daftar-bayar-box h3,
+.dark-mode .ket-grid.total {
   color: #f1f5f9;
 }
 
