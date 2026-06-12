@@ -734,7 +734,7 @@ async function exportToPDF(){
     await new Promise(resolve => setTimeout(resolve, 100));
     
     const canvas = await html2canvas(element, { 
-      scale: 1.2,
+      scale: 2,
       useCORS: true, 
       backgroundColor: '#ffffff',
       onclone: (clonedDoc, clonedElement) => {
@@ -779,7 +779,7 @@ async function exportToPDF(){
     while (heightLeft > 0) {
       position = heightLeft - imgHeight + margin; 
       pdf.addPage();
-      pdf.addImage(imgData, 'PNG', margin, position, imgWidth, imgHeight);
+      pdf.addImage(imgData, 'JPEG', margin, position, imgWidth, imgHeight);
       heightLeft -= (pdfHeight - margin * 2);
     }
     
