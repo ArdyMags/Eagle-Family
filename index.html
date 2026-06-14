@@ -181,7 +181,7 @@
 <div class="modal-overlay" id="tambahModal">
   <div class="modal">
     <h3>➕ Tambah Data Warga</h3>
-    <label>No KK:</label><input type="text" id="t_no_kk">
+    <label>No KK:</label><input type="text" id="t_no_kk" maxlength="16" pattern="[0-9]{16}" placeholder="16 digit angka" required>
     <label>NIK:</label><input type="text" id="t_nik">
     <label>Nama:</label><input type="text" id="t_nama">
     <label>Jenis Kelamin:</label><select id="t_jk"></select>
