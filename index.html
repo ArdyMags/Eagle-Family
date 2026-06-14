@@ -11,6 +11,26 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
+<!-- LOGIN LANDING SCREEN -->
+<div class="login-landing">
+  <div class="login-box">
+    <img src="elangnew1.png" alt="Logo GG Elang 1" class="logo-img">
+    
+    <div class="login-form">
+      <div class="login-form-row username">
+        <label>Username</label>
+        <input type="text" id="loginUsername" autocomplete="off">
+      </div>
+      <div class="login-form-row password">
+        <label>Password</label>
+        <input type="password" id="loginPassword">
+      </div>
+      <div class="login-btn-wrap">
+        <button class="login-btn" onclick="prosesLoginLanding()">Login</button>
+      </div>
+    </div>
+  </div>
+</div>
 <div class="watermarkp"><img src="Elang1.png" alt="Watermark"></div>
 
 
@@ -22,21 +42,10 @@
     <button id="btnBayar" class="dpdown-item admin-only" onclick="runAsAdmin(openBayarModal)">Bayar Iuran</button>
     <button id="btnExportExcel" class="dpdown-item admin-only" onclick="runAsAdmin(openExcelModal)">Export Excel</button>
     <button id="btnExportPDF" class="dpdown-item admin-only" onclick="runAsAdmin(exportToPDF)">Export PDF</button>
+    <button id="btnLogout" class="dpdown-item admin-only" onclick="logout()">Logout</button>
   </div>
   <input type="file" id="inputBuktiTf" accept="image/*" style="display:none" onchange="previewBuktiTf(event)">
   <div class="fab-logo" onclick="toggleMenu()"><img src="Elang1.png" alt="Logo"></div>
-</div>
-
-<div id="loginModal" class="modal-overlay" style="display:none;">
-  <div class="modal">
-    <h3>Login Admin</h3>
-    <label>Password Admin</label>
-    <input type="password" id="adminPassword" placeholder="Masukkan password">
-    <div class="modal-actions">
-      <button class="btn save" onclick="prosesLogin()">Login</button>
-      <button class="btn delete" onclick="closeLoginModal()">Batal</button>
-    </div>
-  </div>
 </div>
 
 <div id="excelModal" class="modal-overlay" style="display:none;">
