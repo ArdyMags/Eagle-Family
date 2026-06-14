@@ -19,7 +19,7 @@ function applyAkses() {
   const lastLogin = localStorage.getItem('lastLogin');
   const now = Date.now();
   // Auto logout 2 jam
-  if (lastLogin && now - lastLogin > 2 * 60 * 60 * 1000) {
+  if (lastLogin && now - lastLogin > 30 * 60 * 1000) { // jam * menit * detik * 1000 milidetik
     localStorage.removeItem('role');
     localStorage.removeItem('lastLogin');
   }
