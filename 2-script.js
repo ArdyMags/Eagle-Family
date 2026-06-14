@@ -16,6 +16,13 @@ function cekAkses() {
 }
 
 function applyAkses() {
+  const lastLogin = localStorage.getItem('lastLogin');
+  const now = Date.now();
+  // Auto logout 2 jam
+  if (lastLogin && now - lastLogin > 2 * 60 * 60 * 1000) {
+    localStorage.removeItem('role');
+    localStorage.removeItem('lastLogin');
+  }
   const isAdmin = cekAkses();
   
   // Kalo belum login = tampilin landing doang
@@ -35,6 +42,7 @@ function applyAkses() {
       btn.title = '';
     }
   });
+  if (isAdmin) localStorage.setItem('lastLogin', now);
 }
 
 let rawData = [], iuranData = [], iuranMap = {}, sortState = { key: '', asc: true };
@@ -254,7 +262,37 @@ function hapusRow(btn){
     openLoginModal();
     return;
   }
- if(confirm("Hapus data ini?")) btn.parentElement.parentElement.remove(); }
+
+  let row = btn.closest('tr');
+  let nik = row.dataset.nik;
+  let id = row.dataset.id;
+
+  if(!confirm(`Hapus data ${row.querySelector('[data-field="nama"]').value}?`)) return;
+
+  if(!id) {
+    alert('Data lama belum ada ID. Hapus manual di Google Sheets dulu.');
+    return;
+  }
+
+  showSpinner();
+  fetch(apiURL, {
+    method: "POST",
+    headers: {"Content-Type":"text/plain;charset=utf-8"},
+    body: JSON.stringify({action:"deleteRow", id: id, nik: nik})
+  })
+ .then(res => res.json())
+ .then(res => {
+    if(res.status === "ok"){
+      alert("Berhasil dihapus");
+      row.remove();
+      loadData(); // refresh
+    } else {
+      alert("Gagal: " + res.message);
+    }
+  })
+ .catch(err => alert("Error: " + err.message))
+ .finally(() => hideSpinner());
+}
 
 function toggleEditRow(btn){
   if (!cekAkses()) {
@@ -266,24 +304,44 @@ function toggleEditRow(btn){
     inputs.forEach(el => el.disabled = false);
     btn.innerHTML = '💾'; btn.className = 'btn save'; btn.setAttribute('onclick', 'saveRow(this)');
   } else {
+
     inputs.forEach(el => el.disabled = true);
     btn.innerHTML = '✏️'; btn.className = 'btn edit'; btn.setAttribute('onclick', 'toggleEditRow(this)');
   }
 }
 
 function saveRow(btn){
-  let row = btn.closest('tr'), obj = { no_kk: row.dataset.kk, id: row.dataset.id, nik: row.dataset.nik };
-  row.querySelectorAll('input[data-field], select[data-field]').forEach(el => { obj[el.dataset.field] = el.value; });
+  let row = btn.closest('tr'), obj = {
+    no_kk: row.dataset.kk,
+    id: row.dataset.id || '', // kalo kosong biarin kosong
+    nik: row.dataset.nik
+  };
+
+  row.querySelectorAll('input[data-field], select[data-field]').forEach(el => {
+    obj[el.dataset.field] = el.value;
+  });
+
   if(!obj.nik){ alert("NIK wajib diisi!"); return; }
+  if(obj.no_kk &&!/^[0-9]{16}$/.test(obj.no_kk)){
+    alert("No KK harus 16 digit angka!"); return;
+  }
+
   showSpinner();
-  fetch(apiURL,{ method:"POST", headers:{"Content-Type":"text/plain;charset=utf-8"}, body:JSON.stringify({action:"updateRow", data: obj}) })
-.then(res=>res.json()).then(res=>{
+  fetch(apiURL,{
+    method:"POST",
+    headers:{"Content-Type":"text/plain;charset=utf-8"},
+    body:JSON.stringify({action:"updateRow", data: obj})
+  })
+ .then(res=>res.json()).then(res=>{
     if(res.status === "ok"){
       alert("Berhasil diupdate");
       row.querySelectorAll('input, select').forEach(el => el.disabled = true);
-      btn.textContent = '✏️'; btn.className = 'btn edit'; btn.setAttribute('onclick', 'toggleEditRow(this)');
+      btn.textContent = '✏️'; btn.className = 'btn edit';
+      btn.setAttribute('onclick', 'toggleEditRow(this)');
       loadData();
-    } else { alert("Gagal: " + res.message); }
+    } else {
+      alert("Gagal: " + res.message);
+    }
   }).catch(err=> alert("Error: " + err.message)).finally(() => hideSpinner());
 }
 
