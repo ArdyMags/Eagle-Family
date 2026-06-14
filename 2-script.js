@@ -17,6 +17,15 @@ function cekAkses() {
 
 function applyAkses() {
   const isAdmin = cekAkses();
+  
+  // Kalo belum login = tampilin landing doang
+  if (!isAdmin) {
+    document.body.classList.add('login-screen');
+  } else {
+    document.body.classList.remove('login-screen');
+    document.body.classList.add('admin-mode');
+  }
+  
   document.querySelectorAll('.admin-only').forEach(btn => {
     if (!isAdmin) {
       btn.classList.add('viewer-mode');
@@ -26,10 +35,6 @@ function applyAkses() {
       btn.title = '';
     }
   });
-  
-  if (isAdmin) {
-    document.body.classList.add('admin-mode');
-  }
 }
 
 let rawData = [], iuranData = [], iuranMap = {}, sortState = { key: '', asc: true };
@@ -418,27 +423,46 @@ function closeBayarModal(){
   document.getElementById('bulanContainer').innerHTML = '';
 }
 
-function openLoginModal() {
-  document.getElementById('loginModal').style.display = 'flex';
-  document.getElementById('adminPassword').value = '';
-  document.getElementById('adminPassword').focus();
+function prosesLoginLanding() {
+  const user = document.getElementById('loginUsername').value.trim();
+  const pass = document.getElementById('loginPassword').value;
+  
+  const USER_ADMIN = 'admin'; // GANTI
+  const PASS_ADMIN = 'admin123'; // GANTI
+  
+  if (user === USER_ADMIN && pass === PASS_ADMIN) {
+    USER_ACCESS = 'admin';
+    localStorage.setItem('role', 'admin');
+    document.body.classList.remove('login-screen');
+    document.body.classList.add('admin-mode');
+    applyAkses();
+    loadData();
+  } else {
+    alert('Username atau Password salah!');
+    document.getElementById('loginPassword').value = '';
+  }
 }
 
-function closeLoginModal() {
-  document.getElementById('loginModal').style.display = 'none';
-}
-
+// Enter key buat submit
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('loginPassword').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') prosesLoginLanding();
+  });
+  document.getElementById('loginUsername').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') prosesLoginLanding();
+  });
+});
 function prosesLogin() {
   const pass = document.getElementById('adminPassword').value;
-  const PASS_ADMIN = 'admin123'; // GANTI INI, atau cek ke Google Apps Script
+  const PASS_ADMIN = 'admin123'; // GANTI INI
   
   if (pass === PASS_ADMIN) {
     USER_ACCESS = 'admin';
-    localStorage.setItem('role', 'admin'); // Simpen biar ga login ulang
-    applyAkses(); // Update tampilan tombol
+    localStorage.setItem('role', 'admin');
+    applyAkses(); // Update tampilan
     closeLoginModal();
     alert('Login berhasil!');
-    loadData(); // Reload data
+    loadData();
   } else {
     alert('Password salah!');
   }
@@ -1011,6 +1035,13 @@ function renderBuktiTf(){
       </div>
     `;
   });
+}
+
+function logout() {
+  localStorage.removeItem('role');
+  USER_ACCESS = 'viewer';
+  applyAkses();
+  location.reload(); // Balik ke landing page
 }
 
 function hapusBuktiTf(index){
