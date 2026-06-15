@@ -10,6 +10,28 @@ const MASTER = {
 let USER_ACCESS = 'viewer'; 
 
 // HAPUS FUNCTION cekAkses() YG DUPLIKAT, PAKE INI AJA
+function showTimeoutPopup() {
+  // Bikin popup sederhana
+  const popup = document.createElement('div');
+  popup.id = 'timeout-popup';
+  popup.style.cssText = `
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center;
+    z-index: 9999; font-family: sans-serif;
+  `;
+  popup.innerHTML = `
+    <div style="background: white; padding: 24px; border-radius: 12px; text-align: center; max-width: 320px;">
+      <h3 style="margin-top:0;">Sesi Berakhir</h3>
+      <p>Waktu anda telah habis. Silakan login kembali.</p>
+      <button onclick="document.body.removeChild(document.getElementById('timeout-popup'))" 
+              style="padding:8px 16px; border:none; background:#2563eb; color:white; border-radius:6px; cursor:pointer;">
+        OK
+      </button>
+    </div>
+  `;
+  document.body.appendChild(popup);
+}
+
 function cekAkses() {
   USER_ACCESS = localStorage.getItem('role') || 'viewer';
   return USER_ACCESS === 'admin';
@@ -18,11 +40,22 @@ function cekAkses() {
 function applyAkses() {
   const lastLogin = localStorage.getItem('lastLogin');
   const now = Date.now();
+  const timeoutMs = 1 * 60 * 1000; // jam * menit * detik * 1000 milidetik
   // Auto logout 2 jam
-  if (lastLogin && now - lastLogin > 30 * 60 * 1000) { // jam * menit * detik * 1000 milidetik
+  if (lastLogin && now - lastLogin > timeoutMs) { 
     localStorage.removeItem('role');
     localStorage.removeItem('lastLogin');
+    // 1. Munculin popup
+    showTimeoutPopup();
+    // 2. Kembali ke page login
+    // Kalau SPA: pake class
+    document.body.classList.add('login-screen');
+    document.body.classList.remove('admin-mode');
+    // Kalau multi-page: pake redirect
+    // window.location.href = '/login.html';
+    return; // stop eksekusi biar gak lanjut cek admin
   }
+
   const isAdmin = cekAkses();
   
   // Kalo belum login = tampilin landing doang
@@ -42,7 +75,6 @@ function applyAkses() {
       btn.title = '';
     }
   });
-  if (isAdmin) localStorage.setItem('lastLogin', now);
 }
 
 let rawData = [], iuranData = [], iuranMap = {}, sortState = { key: '', asc: true };
@@ -491,6 +523,7 @@ function prosesLoginLanding() {
   if (user === USER_ADMIN && pass === PASS_ADMIN) {
     USER_ACCESS = 'admin';
     localStorage.setItem('role', 'admin');
+    localStorage.setItem('lastLogin', Date.now()); // <-- TAMBAHIN INI
     document.body.classList.remove('login-screen');
     document.body.classList.add('admin-mode');
     applyAkses();
@@ -1115,3 +1148,8 @@ window.onload = () => {
 };
 
 loadData();
+
+// Cek timeout tiap 10 detik
+window.logoutChecker = setInterval(() => {
+  applyAkses(); // langsung panggil fungsi yg udah ada logika logoutnya
+}, 10000); // 10 detik sekali. Mau 5 detik juga boleh
