@@ -40,7 +40,7 @@ function cekAkses() {
 function applyAkses() {
   const lastLogin = localStorage.getItem('lastLogin');
   const now = Date.now();
-  const timeoutMs = 1 * 60 * 1000; // jam * menit * detik * 1000 milidetik
+  const timeoutMs = 10 * 60 * 1000; // jam * menit * detik * 1000 milidetik
   // Auto logout 2 jam
   if (lastLogin && now - lastLogin > timeoutMs) { 
     localStorage.removeItem('role');
