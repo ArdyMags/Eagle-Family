@@ -156,6 +156,7 @@ function loadData(){
       buildIuranMap();
       renderTableWarga();
       renderTableIuran();
+      renderTableIuranHuni();
 
       try {
         renderDaftarBayarBulanIni();
@@ -268,6 +269,73 @@ function renderTableIuran(sortedArr = null){
   document.getElementById("bodyIuran").innerHTML = body;
   hitungTotalTunggakan();
 }
+
+function renderTableIuranHuni(sortedArr = null){
+  let grouped = groupByKK(rawData);
+  let bulanList = getPeriode24Bulan();
+  let arr = Object.keys(grouped)
+ .map(kk => {
+    let anggota = grouped[kk];
+    let first = anggota[0];
+    let kepala = anggota.find(a => String(a.status_keluarga || "").toLowerCase().includes("kepala")) || first;
+    return {
+      kk, anggota, first, kepala,
+      nama: kepala.nama || "",
+      blok: first.blok || "",
+      no_rumah: parseInt(first.no_rumah) || 0,
+      status_huni: first.status_huni || ""
+    };
+  })
+ .filter(item => {
+    const s = String(item.status_huni).toLowerCase().trim(); // <-- UBAH SINI
+    return s === "huni" || s === "sewa" || s.includes("huni"); // <-- UBAH SINI
+  });
+
+  if(sortedArr) arr = sortedArr;
+
+  let header = `<tr><th onclick="sortTableIuran('blok')">Blok ⇅</th><th onclick="sortTableIuran('no_rumah')">No Rumah ⇅</th><th onclick="sortTableIuran('nama')">Kepala Keluarga ⇅</th><th onclick="sortTableIuran('status_huni')">Status Huni ⇅</th><th>POS</th><th>FASUM</th>`;
+  bulanList.forEach(b=>{
+  const bulanAngka = String(b.idx + 1).padStart(2, '0'); // idx 0=Jan=01
+  header += `<th data-bulan="${b.tahun}-${bulanAngka}">${b.bulan}'${String(b.tahun).slice(2)}</th>`;
+  });
+  header += `</tr>`;
+  document.getElementById("headerIuranHuni").innerHTML = header;
+
+  let body = "";
+  arr.forEach(item => {
+    let kk = item.kk, first = item.first, namaKK = item.nama;
+    let tunggakan = 0;
+    bulanList.forEach(b => {
+      if (!b.sudahLewat) return;
+      let bayar = iuranData.find(i=> String(i.no_kk).trim()===String(kk).trim() && String(i.bulan).trim().toLowerCase()===b.bulan.toLowerCase() && String(i.tahun).trim()===String(b.tahun));
+      if(!bayar) tunggakan++;
+    });
+    let rowClass = tunggakan >= 3 ? 'class="row-tunggakan"' : '';
+    body += `<tr ${rowClass}><td>${first.blok || "-"}</td><td>${first.no_rumah || "-"}</td><td>${namaKK}</td><td>${first.status_huni || "-"}</td>`;
+    let bayarPos = iuranData.find(i => String(i.no_kk).trim() === kk && String(i.jenis).toUpperCase() === 'POS');
+    body += bayarPos? `<td><span class="pos">☑ POS - 100K</span></td>` : `<td><span class="kosong">⬜ POS</span></td>`;
+    let bayarFasum = iuranData.find(i => String(i.no_kk).trim() === kk && String(i.jenis).toUpperCase() === 'FASUM');
+    body += bayarFasum? `<td><span class="fasum">☑ FASUM - 100K</span></td>` : `<td><span class="kosong">⬜ FASUM</span></td>`;
+    bulanList.forEach(b => {
+      let bayar = iuranMap[`${String(kk).trim()}|${String(b.bulan).trim().toLowerCase()}|${String(b.tahun).trim()}|KAS`] || iuranMap[`${String(kk).trim()}|${String(b.bulan).trim().toLowerCase()}|${String(b.tahun).trim()}|IPL`];
+      let isi = `<span class="kosong">⬜</span>`;
+      if(bayar){
+        let nominal = formatRibu(bayar.nominal);
+        if(String(bayar.jenis).toUpperCase() === "KAS") isi = `<span class="kas">KAS ${nominal}</span>`;
+        else if(String(bayar.jenis).toUpperCase() === "IPL") {
+          let nominalNum = Number(bayar.nominal), classIPL = "ipl";
+          if(nominalNum === 60000) classIPL = "ipl-nonis"; else if(nominalNum === 50000) classIPL = "ipl-pengurus";
+          isi = `<span class="${classIPL}">IPL ${nominal}</span>`;
+        }
+      }
+      body += `<td>${isi}</td>`;
+    });
+    body += `</tr>`;
+  });
+  document.getElementById("bodyIuranHuni").innerHTML = body;
+  hitungTotalTunggakan();
+}
+
 
 function renderTableIuranSorted(arr){ renderTableIuran(arr); }
 
