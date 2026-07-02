@@ -122,12 +122,6 @@
         <tbody id="bodyIuran"></tbody>
       </table>
     </div>
-    <div id="buktiTf" style="margin-top: 20px; display: none;">
-      <h3 style="margin-bottom: 10px;">Bukti Transfer:</h3>
-      <div id="listBuktiTf" style="display: flex; flex-wrap: wrap; gap: 10px;">
-        <!-- Gambar bukti TF bakal muncul di sini -->
-      </div>
-    </div>
 
 <div class="info-bawah-tabel">
   <div class="ket-ipl-box">
@@ -140,6 +134,7 @@
       <p>Pengajian: Rp 5.000</p>
       <p class="ket-grid total"><strong>Total IPL: Rp 65.000</strong></p>
       <p><strong>Total IPL Nonis: Rp 60.000</strong></p>
+      <p class="ket-grid total"><strong>KAS (Belum Huni): Rp 10.000</strong></p>
     </div>
   </div>
 
@@ -150,9 +145,26 @@
     </div>
   </div>
 </div>
+    <div id="buktiTf" style="margin-top: 20px; display: none;">
+      <h3 style="margin-bottom: 10px;">Bukti Transfer:</h3>
+      <div id="listBuktiTf" style="display: flex; flex-wrap: wrap; gap: 10px;">
+        <!-- Gambar bukti TF bakal muncul di sini -->
+      </div>
+    </div>
 
   </div> <!-- tutup printArea -->
   </section> <!-- tutup section yang ketinggalan -->
+
+<section>
+  <h2>🏠 REKAP IURAN WARGA HUNI</h2>
+
+  <div class="card">
+    <table id="tableIuranHuni">
+      <thead id="headerIuranHuni"></thead>
+      <tbody id="bodyIuranHuni"></tbody>
+    </table>
+  </div>
+</section>
    
 <div class="modal-overlay" id="bayarModal">
   <div class="modal">
